@@ -15,4 +15,6 @@ steps:
     - '--image'
     - 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA'
 images: ['europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA']
+options:
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
 
