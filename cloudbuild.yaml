@@ -1,8 +1,8 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA', '.']
+  args: ['build', '-t', 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA']
+  args: ['push', 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app']
 - name: 'gcr.io/google-cloud-sdk'
   entrypoint: 'gcloud'
   args:
@@ -13,8 +13,8 @@ steps:
     - '--region'
     - 'europe-central2'
     - '--image'
-    - 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA'
-images: ['europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app:$SHORT_SHA']
+    - 'europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app'
+images: ['europe-central2-docker.pkg.dev/$PROJECT_ID/docker-images/next-js-app']
 options:
   defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
 
