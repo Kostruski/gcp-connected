@@ -8,6 +8,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  EmailAuthProvider,
 } from 'firebase/auth';
 
 export const firebaseConfig = {
@@ -112,3 +113,5 @@ export async function sendPasswordResetEmailFunc(email: string) {
     return false; // Indicate failure
   }
 }
+
+export const emailAuthProviderId = EmailAuthProvider.PROVIDER_ID;
