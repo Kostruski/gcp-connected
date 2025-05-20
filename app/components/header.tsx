@@ -52,7 +52,7 @@ const HeaderComponent = () => {
           console.log('Logout user');
         }
       }),
-    [firebaseAuth],
+    [],
   );
 
   useEffect(() => {
