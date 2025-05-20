@@ -1,12 +1,6 @@
 // firebase.ts
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import {
-  Auth,
-  getAuth,
-  sendPasswordResetEmail,
-  signOut,
-  EmailAuthProvider,
-} from 'firebase/auth';
+import { Auth, getAuth, signOut, EmailAuthProvider } from 'firebase/auth';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
