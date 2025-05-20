@@ -9,7 +9,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   EmailAuthProvider,
+  sendEmailVerification,
 } from 'firebase/auth';
+import Cookies from 'js-cookie';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -36,9 +38,17 @@ onAuthStateChanged(firebaseAuth, async (user) => {
   try {
     if (user) {
       const idToken = await user.getIdToken(); // Get fresh token
-      // Send idToken with your API request to the server
-      console.log('User is signed in:', user, idToken);
+      Cookies.set('__session', idToken);
+
+
+      if(!user.emailVerified) {
+        sendEmailVerification(user);
+      }
+    } else {
+      Cookies.remove("__session");
     }
+
+    window.location.reload();
   } catch (error) {
     console.error('Auth state change error:', error);
     console.log('Logout user');
