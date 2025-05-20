@@ -19,12 +19,9 @@ type UserInfo = {
   displayName: string | null;
 };
 
-const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
-
 const HeaderComponent = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
-
-  useEffect(() => {});
+  const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
   const getAuthCheck = useMemo(
     () => () =>
