@@ -19,40 +19,45 @@ type UserInfo = {
   displayName: string | null;
 };
 
-const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
-
 const HeaderComponent = () => {
   const [user, setUser] = useState<UserInfo | null>(null);
 
-  useEffect(() => {});
-
   const getAuthCheck = useMemo(
-    () => () =>
-      onAuthStateChanged(firebaseAuth, async (authUser) => {
+    () => () => {
+      try {
         if (!window) return;
 
-        try {
-          if (authUser) {
-            setUser({
-              email: authUser.email ?? '',
-              emailVerified: authUser.emailVerified,
-              uid: authUser.uid,
-              displayName: authUser.displayName,
-            });
+        const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
-            if (!authUser.emailVerified) {
-              sendEmailVerification(authUser);
+        onAuthStateChanged(firebaseAuth, async (authUser) => {
+          try {
+            // This inner try-catch handles errors within the auth state change callback
+            if (authUser) {
+              setUser({
+                email: authUser.email ?? '',
+                emailVerified: authUser.emailVerified,
+                uid: authUser.uid,
+                displayName: authUser.displayName,
+              });
+
+              if (!authUser.emailVerified) {
+                sendEmailVerification(authUser);
+              }
+            } else {
+              Cookies.remove('__session');
+              setUser(null);
             }
-          } else {
-            Cookies.remove('__session');
-            setUser(null);
+          } catch (error) {
+            console.error('Auth state change callback error:', error);
+            // Consider logging out or showing a user-friendly error message
           }
-        } catch (error) {
-          console.error('Auth state change error:', error);
-          console.log('Logout user');
-        }
-      }),
-    [firebaseAuth],
+        });
+      } catch (outerError) {
+        console.error('Error setting up auth state listener:', outerError);
+        console.log('Potentially Firebase not initialized or accessible.');
+      }
+    },
+    [], // Dependencies are empty, so this function is only created once
   );
 
   useEffect(() => {

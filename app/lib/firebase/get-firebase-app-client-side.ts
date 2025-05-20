@@ -1,12 +1,6 @@
 // firebase.ts
 import { FirebaseApp, initializeApp } from 'firebase/app';
-import {
-  Auth,
-  getAuth,
-  sendPasswordResetEmail,
-  signOut,
-  EmailAuthProvider,
-} from 'firebase/auth';
+import { Auth, getAuth, signOut, EmailAuthProvider } from 'firebase/auth';
 
 export const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -20,6 +14,7 @@ let app: FirebaseApp; //Declare a variable to hold the app instance.
 let authInstance: Auth; //Declare a variable to hold the auth instance.
 
 export const getFirebaseAppClientSide = () => {
+  console.log('Firebase client config:', firebaseConfig);
   if (!app) {
     app = initializeApp(firebaseConfig);
     authInstance = getAuth(app);
