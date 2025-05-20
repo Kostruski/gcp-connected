@@ -14,6 +14,7 @@ let app: FirebaseApp; //Declare a variable to hold the app instance.
 let authInstance: Auth; //Declare a variable to hold the auth instance.
 
 export const getFirebaseAppClientSide = () => {
+  console.log('Firebase client config:', firebaseConfig);
   if (!app) {
     app = initializeApp(firebaseConfig);
     authInstance = getAuth(app);
