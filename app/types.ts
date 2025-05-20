@@ -12,3 +12,4 @@ export interface AuthObject {
   operationType: string;
   additionalUserInfo: AdditionalUserInfo;
 }
+

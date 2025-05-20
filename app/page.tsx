@@ -1,10 +1,19 @@
-import Image from "next/image";
-import styles from "./page.module.scss";
+import Image from 'next/image';
+import styles from './page.module.scss';
+import { verifyToken } from './lib/firebase/get-firebase-app-server-side';
+import { redirect } from 'next/navigation';
 
-export default function Home() {
+export default async function Home() {
+  const tokenOk = await verifyToken();
+
+  // perform this check for auth pages
+  if (!tokenOk) {
+    redirect('/login');
+  }
+
   return (
     <div className={styles.page}>
-      <main className={ styles.main }>
+      <main className={styles.main}>
         <h1>Updated again</h1>
         <Image
           className={styles.logo}
@@ -47,6 +56,6 @@ export default function Home() {
           </a>
         </div>
       </main>
-     </div>
+    </div>
   );
 }

@@ -3,6 +3,7 @@
 import AuthUi from '../components/auth-ui';
 
 const AuthPage = () => {
+
   return (
     <div>
       <div id="firebaseui-auth-container">AuthPage</div>

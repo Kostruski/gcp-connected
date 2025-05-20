@@ -1,5 +1,6 @@
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import admin from 'firebase-admin';
+import { cookies } from 'next/headers';
 export const isProduction = process.env.NODE_ENV === 'production';
 
 const client = new SecretManagerServiceClient();
@@ -54,6 +55,27 @@ const getFirebaseAppServerSide = async () => {
   }
 
   return { firebaseApp, auth: auth, db };
+};
+
+// Redirect needs to be in the page component
+export const verifyToken = async (): Promise<boolean> => {
+  const sessionCookie = (await cookies()).get('__session')?.value;
+  const { auth } = await getFirebaseAppServerSide();
+
+  if (!sessionCookie) {
+    console.log('No session cookie found.');
+    return false; // Indicate failure
+  }
+
+  try {
+    // Await the verification, it returns a promise
+    await auth.verifyIdToken(sessionCookie);
+    console.log('ID token successfully verified.');
+    return true; // Indicate success
+  } catch (error: any) {
+    console.error('Error verifying ID token:', error);
+    return false; // Indicate failure
+  }
 };
 
 export default getFirebaseAppServerSide;
