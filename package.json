@@ -9,7 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google-cloud/secret-manager": "^6.0.1",
+    "@types/js-cookie": "^3.0.6",
     "bootstrap": "^5.3.6",
+    "firebase": "^11.7.3",
+    "firebase-admin": "^13.4.0",
+    "firebaseui": "^6.1.0",
+    "js-cookie": "^3.0.5",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.10",
