@@ -51,6 +51,9 @@ images:
 options:
   substitutionOption: ALLOW_LOOSE
   logging: CLOUD_LOGGING_ONLY
+secrets: # Define the secret source here
+  - name: 'firebase-api-key' # This should match the Secret Manager secret name
+    versionName: 'projects/$PROJECT_ID/secrets/firebase-api-key/versions/latest' # Correct format
 substitutions:
   _TRIGGER_ID: c11aad35-ef59-46e6-8352-c348e4a7836b
   _SERVICE_NAME: next-js-app
