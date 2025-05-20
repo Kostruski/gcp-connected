@@ -1,9 +1,6 @@
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import admin from 'firebase-admin';
 import { cookies } from 'next/headers';
 export const isProduction = process.env.NODE_ENV === 'production';
-
-const client = new SecretManagerServiceClient();
 
 const getFirebaseAppServerSide = async () => {
   // Initialize Firebase Admin SDK ONLY ONCE at the top level of your api route
@@ -12,25 +9,9 @@ const getFirebaseAppServerSide = async () => {
   let db: admin.firestore.Firestore | null = null;
 
   try {
-    let serviceAccount = '';
-
-    if (isProduction) {
-      const [version] = await client.accessSecretVersion({
-        name: 'firebase-service-account-key',
-      });
-
-      if (!version.payload?.data) {
-        throw new Error('Secret version payload is empty.');
-      }
-
-      serviceAccount = JSON.parse(version.payload.data.toString());
-    } else {
-      if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
-        throw new Error('FIREBASE_SERVICE_ACCOUNT is not defined.');
-      }
-
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT ?? '{}');
-    }
+    const serviceAccount = JSON.parse(
+      process.env.FIREBASE_SERVICE_ACCOUNT ?? '{}',
+    );
 
     if (admin.apps.length === 0) {
       firebaseApp = admin.initializeApp({
