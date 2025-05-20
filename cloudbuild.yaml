@@ -21,7 +21,7 @@ steps:
       - Dockerfile
     id: Build
     secretEnv:
-      - 'FIREBASE_API_KEY' # <-- CORRECTED SYNTAX: List of environment variable names
+      - 'FIREBASE_API_KEY' # <-- This is the environment variable name requested
   - name: gcr.io/cloud-builders/docker
     args:
       - push
@@ -62,6 +62,6 @@ substitutions:
 tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
-secrets: # <-- CORRECTED SYNTAX for secrets block
-  - secret: 'projects/$PROJECT_ID/secrets/firebase-api-key/versions/latest'
-    env: 'FIREBASE_API_KEY' # This is the environment variable name that will be populated by the secret
+secrets: # <-- THIS IS THE CORRECTED SYNTAX for the top-level secrets block
+  - versionName: 'projects/$PROJECT_ID/secrets/firebase-api-key/versions/latest'
+    env: 'FIREBASE_API_KEY' # <-- This maps the secret to the ENV variable name for build steps
