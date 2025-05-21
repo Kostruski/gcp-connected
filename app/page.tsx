@@ -8,7 +8,7 @@ export default async function Home() {
 
   // perform this check for auth pages
   if (!tokenOk) {
-    redirect('/login');
+    redirect('/logout');
   }
 
   return (
