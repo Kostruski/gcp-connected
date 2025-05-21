@@ -36,7 +36,7 @@ steps:
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
       - '--set-secrets'
-      - 'FIREBASE_SERVICE_ACCOUNT=firebase-service-account-key' # Still correct for Cloud Run
+      - 'FIREBASE_SERVICE_ACCOUNT=firebase-service-account-key:latest' # Still correct for Cloud Run
     id: Deploy
     entrypoint: gcloud # entrypoint: gcloud is still correct for this step as it doesn't need to read secrets into its args like the docker build step does.
 images:
