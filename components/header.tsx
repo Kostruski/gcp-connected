@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row, Stack } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/esm/Navbar';
 import {
   getFirebaseAppClientSide,
@@ -53,10 +53,13 @@ const HeaderComponent = () => {
   }, [setCurrentUser]);
 
   return (
-    <Navbar sticky="top">
-      <Container>
-        <Row>
-          <Col>
+    <Navbar sticky="top" className="p-4">
+      <Col xs={8}>
+        <h2>Intuitius</h2>
+      </Col>
+      <Col xs={4}>
+        <Stack direction="horizontal" gap={3}>
+          <div className="p-2">
             {currentUser ? (
               currentUser.emailVerified ? (
                 `Welcome ${currentUser.displayName || currentUser.email}`
@@ -68,8 +71,8 @@ const HeaderComponent = () => {
                 <Button>Login</Button>
               </Link>
             )}
-          </Col>
-          <Col>
+          </div>
+          <div className="p-2">
             {currentUser && (
               <Button
                 onClick={async () => {
@@ -84,9 +87,9 @@ const HeaderComponent = () => {
                 Logout
               </Button>
             )}
-          </Col>
-        </Row>
-      </Container>
+          </div>
+        </Stack>
+      </Col>
     </Navbar>
   );
 };

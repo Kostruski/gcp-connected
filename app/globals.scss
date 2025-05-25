@@ -1,44 +1,30 @@
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+
+$primary: #3d3442;
+$gold: #a8782f;
+$body-color: #a8782f;
+$body-bg: $black;
+
+// scss-docs-start theme-colors-map
+$theme-colors: (
+	"primary": $primary,
+	"secondary": $secondary,
+	"success": $success,
+	"info": $info,
+	"warning": $warning,
+	"danger": $danger,
+	"light": $light,
+	"dark": $dark
+);
+
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+.btn-primary {
+	color: $gold;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.card {
+	border-color: currentColor;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-}
