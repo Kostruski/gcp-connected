@@ -1,35 +1,24 @@
-// firebase.ts
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import { Auth, getAuth, signOut, EmailAuthProvider } from 'firebase/auth';
+import { FirebaseApp } from 'firebase/app';
+import { firebaseConfig } from './firebaseConfig';
 
-export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-let app: FirebaseApp; //Declare a variable to hold the app instance.
-let authInstance: Auth; //Declare a variable to hold the auth instance.
+let app: FirebaseApp;
+let authInstance: Auth;
 
 export const getFirebaseAppClientSide = () => {
-  // const stack = new Error().stack;
-  // if (stack) {
-  //   const stackLines = stack.split('\n');
-  //   console.log('Firebase stack trace:', stackLines[2]);
-  // }
-
   if (!app) {
-    app = initializeApp(firebaseConfig);
+    // Initialize Firebase using the compat API.  This is CRITICAL for the global 'firebase' object.
+    app = firebase.initializeApp(firebaseConfig);
     authInstance = getAuth(app);
   }
+
   return { app, authInstance };
 };
 
-const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
-
 export async function signOutUser() {
+  const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
   try {
     return await signOut(firebaseAuth);
   } catch (error) {

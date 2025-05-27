@@ -68,6 +68,7 @@ const HeaderComponent = () => {
   }, []);
 
   return (
+    <>
     <Navbar sticky="top" className="p-4">
       <Col xs={8}>
         <Link href="/">
@@ -107,7 +108,8 @@ const HeaderComponent = () => {
           </div>
         </Stack>
       </Col>
-    </Navbar>
+      </Navbar>
+      </>
   );
 };
 

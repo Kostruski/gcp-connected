@@ -3,6 +3,15 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.scss';
 import Header from '../components/header';
 import { Col, Container, Row } from 'react-bootstrap';
+import Script from 'next/script';
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,8 +34,38 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="mdl-js">
       <body id="body" className={`${geistSans.variable} ${geistMono.variable}`}>
+        <Script
+          src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="firebase-init-global"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window.firebase !== 'undefined' && window.firebase.apps && window.firebase.apps.length === 0) {
+                const firebaseConfig = ${JSON.stringify(firebaseConfig)};
+                try {
+                  window.firebase.initializeApp(firebaseConfig);
+                } catch (e) {
+                  if (!e.message.includes("already exists")) {
+                    console.error("Error initializing Firebase from global script:", e);
+                  }
+                }
+              }
+            `,
+          }}
+        />
+        <Script
+          src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth__pl.js"
+          strategy="beforeInteractive"
+        ></Script>
         <Header />
         <Container fluid className="p-4">
           <Row>
