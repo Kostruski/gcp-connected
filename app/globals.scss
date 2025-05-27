@@ -23,6 +23,7 @@ $theme-colors: (
 
 body {
 	min-height: 100vh;
+	max-width: 100vw;
 }
 
 .btn-primary {
@@ -31,4 +32,9 @@ body {
 
 .card {
 	border-color: currentColor;
+}
+
+a {
+	color: currentColor;
+	text-decoration: none;
 }

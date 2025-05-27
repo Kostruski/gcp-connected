@@ -1,11 +1,9 @@
 'use client';
 
-import { Button, Col, Stack } from 'react-bootstrap';
-import Navbar from 'react-bootstrap/esm/Navbar';
+import { Button, Col, Navbar, Stack } from 'react-bootstrap';
 import { onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
-import { useEffect } from 'react'; // No need for useMemo here for the effect
-import Link from 'next/link';
+import { useEffect, useMemo } from 'react'; // No need for useMemo here for the effect
 import dynamic from 'next/dynamic';
 import useStore from '../store/store';
 import { useShallow } from 'zustand/react/shallow';
@@ -14,6 +12,8 @@ import {
   signOutUser,
 } from '../lib/firebase/get-firebase-app-client-side';
 import { createStars, updateStarAppearance } from './render-stars';
+import Link from 'next/dist/client/link';
+import _ from 'lodash';
 
 const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
@@ -25,13 +25,17 @@ const HeaderComponent = () => {
     })),
   );
 
+  const debounceCreateStars = useMemo(() => {
+    return _.debounce(() => {
+      createStars();
+    }, 500);
+  }, []);
+
   useEffect(() => {
     if (!firebaseAuth) {
       console.warn('Firebase Auth instance not available in useEffect.');
       return;
     }
-
-    console.log('Setting up onAuthStateChanged listener...');
 
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (authUser) => {
       try {
@@ -48,24 +52,27 @@ const HeaderComponent = () => {
     });
 
     return () => {
-      console.log('Unsubscribing from onAuthStateChanged listener.');
       unsubscribe();
     };
   }, [setCurrentUser]);
 
   useEffect(() => {
-    createStars();
+    debounceCreateStars();
     document.addEventListener('mousemove', updateStarAppearance);
+    window.addEventListener('resize', debounceCreateStars);
 
     return () => {
       document.removeEventListener('mousemove', updateStarAppearance);
+      window.removeEventListener('resize', debounceCreateStars);
     };
   }, []);
 
   return (
     <Navbar sticky="top" className="p-4">
       <Col xs={8}>
-        <h2>Intuitius</h2>
+        <Link href="/">
+          <h2>Intuitius</h2>
+        </Link>
       </Col>
       <Col xs={4}>
         <Stack direction="horizontal" gap={3}>

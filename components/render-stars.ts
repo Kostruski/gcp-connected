@@ -25,7 +25,7 @@ export function createStar(): HTMLDivElement | null {
   const opacity: number = Math.random();
 
   star.style.position = 'absolute';
-  star.style.backgroundColor = '#fff';
+  star.style.backgroundColor = '#a8782f';
   star.style.borderRadius = '50%';
   star.style.width = `${size}px`;
   star.style.height = `${size}px`;
@@ -49,16 +49,20 @@ export function updateStarPositions(): void {
   });
 }
 
-// Function to generate stars and add them to the body
 export function createStars(): void {
   container = document.getElementById('body');
   if (!container) return;
+
+  const existingStars: NodeListOf<HTMLDivElement> =
+    container.querySelectorAll('.star');
+
+  existingStars.forEach((star) => {
+    container?.removeChild(star);
+  });
+
   numStars = Math.round(
     (container.clientWidth * container.clientHeight) / 12000,
   ); // Adjust star density based on screen size
-
-  console.log('container width:', container.clientWidth);
-  console.log('container height:', container.clientHeight);
 
   for (let i = 0; i < numStars; i++) {
     const star = createStar();

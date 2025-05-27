@@ -1,11 +1,10 @@
-import translations from './lang';
+import { LanguageCode, TranslationKey } from '../types';
+import translations from './translations';
 
-type CurrentLanguageType = 'en'; // add more later
-type TranslationKey = keyof typeof translations;
 type Params = Record<string, string>;
 
 function translate(
-  currentLanguage: CurrentLanguageType,
+  currentLanguage: LanguageCode,
   key: TranslationKey,
   params: Params = {},
 ): string {
@@ -16,7 +15,7 @@ function translate(
     return key; // Fallback: return the key itself
   }
 
-  let translatedText = textObject[currentLanguage];
+  let translatedText = textObject[currentLanguage] as string;
 
   if (translatedText === undefined) {
     console.warn(
