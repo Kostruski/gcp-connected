@@ -2,10 +2,6 @@
 
 import { Button, Col, Stack } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/esm/Navbar';
-import {
-  getFirebaseAppClientSide,
-  signOutUser,
-} from '../app/lib/firebase/get-firebase-app-client-side';
 import { onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react'; // No need for useMemo here for the effect
@@ -13,6 +9,10 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import useStore from '../store/store';
 import { useShallow } from 'zustand/react/shallow';
+import {
+  getFirebaseAppClientSide,
+  signOutUser,
+} from '../lib/firebase/get-firebase-app-client-side';
 
 const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 

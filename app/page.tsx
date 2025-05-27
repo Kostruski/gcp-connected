@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import styles from './page.module.scss';
-import { verifyToken } from './lib/firebase/get-firebase-app-server-side';
 import { redirect } from 'next/navigation';
+import { verifyToken } from '../lib/firebase/get-firebase-app-server-side';
 
 export default async function Home() {
   const tokenOk = await verifyToken();
