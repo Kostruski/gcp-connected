@@ -13,6 +13,7 @@ import {
   getFirebaseAppClientSide,
   signOutUser,
 } from '../lib/firebase/get-firebase-app-client-side';
+import { createStars, updateStarAppearance } from './render-stars';
 
 const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
@@ -51,6 +52,15 @@ const HeaderComponent = () => {
       unsubscribe();
     };
   }, [setCurrentUser]);
+
+  useEffect(() => {
+    createStars();
+    document.addEventListener('mousemove', updateStarAppearance);
+
+    return () => {
+      document.removeEventListener('mousemove', updateStarAppearance);
+    };
+  }, []);
 
   return (
     <Navbar sticky="top" className="p-4">

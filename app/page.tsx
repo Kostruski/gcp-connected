@@ -1,15 +1,15 @@
 import Image from 'next/image';
 import styles from './page.module.scss';
-import { redirect } from 'next/navigation';
-import { verifyToken } from '../lib/firebase/get-firebase-app-server-side';
+// import { redirect } from 'next/navigation';
+// import { verifyToken } from '../lib/firebase/get-firebase-app-server-side';
 
 export default async function Home() {
-  const tokenOk = await verifyToken();
+  // const tokenOk = await verifyToken();
 
   // perform this check for auth pages
-  if (!tokenOk) {
-    redirect('/logout');
-  }
+  // if (!tokenOk) {
+  //   redirect('/logout');
+  // }
 
   return (
     <div className={styles.page}>

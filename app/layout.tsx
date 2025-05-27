@@ -26,7 +26,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body id="body" className={`${geistSans.variable} ${geistMono.variable}`}>
         <Header />
         <Container fluid className="p-4">
           <Row>

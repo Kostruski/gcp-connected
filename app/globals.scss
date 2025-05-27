@@ -21,6 +21,10 @@ $theme-colors: (
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
 @import "./firebase_ui.scss";
 
+body {
+	min-height: 100vh;
+}
+
 .btn-primary {
 	color: $gold;
 }
