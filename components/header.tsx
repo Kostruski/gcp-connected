@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Col, Container, Row, Stack } from 'react-bootstrap';
+import { Button, Col, Stack } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/esm/Navbar';
 import {
   getFirebaseAppClientSide,

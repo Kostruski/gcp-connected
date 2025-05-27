@@ -19,6 +19,7 @@ $theme-colors: (
 );
 
 @import "../node_modules/bootstrap/scss/bootstrap.scss";
+@import "./firebase_ui.scss";
 
 .btn-primary {
 	color: $gold;
@@ -27,4 +28,3 @@ $theme-colors: (
 .card {
 	border-color: currentColor;
 }
-
