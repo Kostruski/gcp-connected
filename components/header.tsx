@@ -5,7 +5,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import Cookies from 'js-cookie';
 import { useEffect, useMemo } from 'react'; // No need for useMemo here for the effect
 import dynamic from 'next/dynamic';
-import useStore from '../store/store';
+import useAppState from '../store/store';
 import { useShallow } from 'zustand/react/shallow';
 import {
   getFirebaseAppClientSide,
@@ -18,7 +18,7 @@ import _ from 'lodash';
 const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
 const HeaderComponent = () => {
-  const { currentUser, setCurrentUser } = useStore(
+  const { currentUser, setCurrentUser } = useAppState(
     useShallow((state) => ({
       currentUser: state.currentUser,
       setCurrentUser: state.setCurrentUser,

@@ -1,12 +1,12 @@
 'use client';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import Container from 'react-bootstrap/esm/Container';
-import useStore from '../../store/store';
+import useAppState from '../../store/store';
 import { sendEmailVerification } from 'firebase/auth';
 import { useShallow } from 'zustand/react/shallow';
 
 const VerifyPage = () => {
-  const { currentUser } = useStore(
+  const { currentUser } = useAppState(
     useShallow((state) => ({
       currentUser: state.currentUser,
       setCurrentUser: state.setCurrentUser,
