@@ -15,15 +15,19 @@
     "firebase": "^11.7.3",
     "firebase-admin": "^13.4.0",
     "firebaseui": "^6.1.0",
+    "gsap": "^3.13.0",
     "js-cookie": "^3.0.5",
+    "lodash": "^4.17.21",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.0.0",
-    "sass": "^1.88.0"
+    "sass": "^1.88.0",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

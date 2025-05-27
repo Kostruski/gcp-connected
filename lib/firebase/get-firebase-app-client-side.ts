@@ -14,7 +14,12 @@ let app: FirebaseApp; //Declare a variable to hold the app instance.
 let authInstance: Auth; //Declare a variable to hold the auth instance.
 
 export const getFirebaseAppClientSide = () => {
-  console.log('Firebase client config:', firebaseConfig);
+  // const stack = new Error().stack;
+  // if (stack) {
+  //   const stackLines = stack.split('\n');
+  //   console.log('Firebase stack trace:', stackLines[2]);
+  // }
+
   if (!app) {
     app = initializeApp(firebaseConfig);
     authInstance = getAuth(app);
@@ -26,10 +31,10 @@ const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
 
 export async function signOutUser() {
   try {
-    await signOut(firebaseAuth);
+    return await signOut(firebaseAuth);
   } catch (error) {
     console.error('Sign-out error:', error);
-    // Handle sign-out error
+    throw error;
   }
 }
 

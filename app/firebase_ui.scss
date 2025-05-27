@@ -1,0 +1,15 @@
+.firebaseui-textfield input {
+	@extend .form-control;
+}
+
+.firebaseui-textfield label {
+	@extend .form-label;
+	@extend .mb-2;
+}
+
+.firebaseui-button {
+	@extend .btn;
+	@extend .btn-primary;
+	@extend .w-100;
+	@extend .my-4;
+}

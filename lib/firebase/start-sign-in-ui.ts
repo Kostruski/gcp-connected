@@ -1,3 +1,4 @@
+import { sendEmailVerification } from 'firebase/auth';
 import {
   emailAuthProviderId,
   getFirebaseAppClientSide,
@@ -30,6 +31,10 @@ class FirebaseUiManager {
         signInSuccessWithAuthResult: (authResult: any) => {
           if (authResult.user.accessToken) {
             Cookies.set('__session', authResult.user.accessToken);
+
+            if (authResult.additionalUserInfo.isNewUser) {
+              sendEmailVerification(authResult.user);
+            }
 
             return true;
           }

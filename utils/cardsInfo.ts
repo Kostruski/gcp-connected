@@ -1,0 +1,26 @@
+// This names correspond to card images in the public folder
+
+export const ALL_TAROT_CARD_NAMES = [
+  '0_fool',
+  '1_magician',
+  '2_Highpriestess',
+  '3_empress',
+  '4_emperor',
+  '5_hierophant',
+  '6_lovers',
+  '7_chariot',
+  '8_strength',
+  '9_hermit',
+  '10_wheeloffortune',
+  '11_justice',
+  '12_hangedman',
+  '13_death',
+  '14_temperance',
+  '15_devil',
+  '16_tower',
+  '17_star',
+  '18_moon',
+  '19_sun',
+  '20_judgement',
+  '21_world',
+] as const;
