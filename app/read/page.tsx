@@ -1,14 +1,8 @@
-import { redirect } from 'next/navigation';
 import { Col, Container, Row } from 'react-bootstrap';
-import { verifyToken } from '../../lib/firebase/get-firebase-app-server-side';
+import authPage from '../../utils/authPage';
 
 const ReadPage = async () => {
-  const tokenOk = await verifyToken();
-
-  // perform this check for auth pages
-  if (!tokenOk) {
-    redirect('/logout');
-  }
+await authPage()
 
   return (
     <Container>

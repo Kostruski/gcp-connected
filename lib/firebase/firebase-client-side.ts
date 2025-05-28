@@ -1,16 +1,20 @@
 // lib/firebase/start-sign-in-ui.ts
 
-import { Auth, sendEmailVerification } from 'firebase/auth';
+import { Auth, sendEmailVerification, signOut } from 'firebase/auth';
 // No need to import getFirebaseAppClientSide if you're relying purely on global window.firebase for UI
 // import { getFirebaseAppClientSide } from './get-firebase-app-client-side';
 import Cookies from 'js-cookie';
-import { emailAuthProviderId } from './get-firebase-app-client-side';
+import { emailAuthProviderId } from './firebaseConfig';
 
 // Define the global types for window.firebase and window.firebaseui
 declare global {
   interface Window {
     firebase: any; // Using 'any' for global firebase due to compat layer and unknown exact structure
-    firebaseui: any; // Using 'any' for global firebaseui
+    firebaseui: {
+      auth: {
+        AuthUI: any;
+      };
+    };
   }
 }
 
@@ -60,8 +64,14 @@ class FirebaseUiManager {
 
     FirebaseUiManager.instance = new FirebaseUiManager(auth);
     // Instantiate FirebaseUI with the global Firebase Auth instance
-    FirebaseUiManager.instance.ui = new window.firebaseui.auth.AuthUI(auth);
+    FirebaseUiManager.instance.ui =
+      window.firebaseui.auth.AuthUI.getInstance() ||
+      new window.firebaseui.auth.AuthUI(auth);
     return FirebaseUiManager.instance;
+  }
+
+  public getFirebaseAuth(): Auth {
+    return window.firebase.auth();
   }
 
   public start(elementId: string): void {
@@ -99,8 +109,24 @@ class FirebaseUiManager {
   }
 }
 
-// Export only the start method from the singleton instance
 export const startSignInUi = async () => {
   const firebaseUiManager = await FirebaseUiManager.initialize();
   firebaseUiManager.start('#firebaseui-auth-container');
+};
+
+export const getFirebaseAppClientSide = async () => {
+  const firebaseUiManager = await FirebaseUiManager.initialize();
+
+  return firebaseUiManager.getFirebaseAuth();
+};
+
+export const signOutUser = async () => {
+  const firebaseAuth = await getFirebaseAppClientSide();
+
+  try {
+    return await signOut(firebaseAuth);
+  } catch (error) {
+    console.error('Sign-out error:', error);
+    throw error;
+  }
 };
