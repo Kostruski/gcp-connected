@@ -1,7 +1,7 @@
 'use client';
 
 import { Row, Col, Container, Card } from 'react-bootstrap';
-import AuthUi from '../../components/auth-ui';
+import AuthUi from '../../../components/auth-ui';
 
 const AuthPage = () => {
   // const authContainerRef = useRef<HTMLDivElement>(null);

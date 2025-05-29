@@ -1,5 +1,5 @@
 import { Col, Container, Row } from 'react-bootstrap';
-import authPage from '../../utils/authPage';
+import authPage from '../../../utils/authPage';
 
 const ReadPage = async () => {
 await authPage()

@@ -20,6 +20,7 @@ const HeaderComponent = () => {
     useShallow((state) => ({
       currentUser: state.currentUser,
       setCurrentUser: state.setCurrentUser,
+      setCurrentLanguage: state.setCurrentLanguage,
     })),
   );
   const unsubscribeRef = useRef<Unsubscribe>(() => {});
