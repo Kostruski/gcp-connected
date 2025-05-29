@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import './globals.scss';
-import Header from '../components/header';
+import '../globals.scss';
+import Header from '../../components/header/header';
 import { Col, Container, Row } from 'react-bootstrap';
 import Script from 'next/script';
 
@@ -30,9 +30,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ lang: string }>;
 }>) {
+  const { lang } = await params;
   return (
     <html lang="en" className="mdl-js">
       <body id="body" className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -63,7 +66,7 @@ export default async function RootLayout({
           }}
         />
         <Script
-          src="https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth__pl.js"
+          src={`https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth__${lang}.js`}
           strategy="beforeInteractive"
         ></Script>
         <Header />

@@ -86,19 +86,19 @@ class FirebaseUiManager {
       signInSuccessUrl: '/',
       callbacks: {
         signInSuccessWithAuthResult: (authResult: any) => {
-          if (authResult?.user?.stsTokenManager?.accessToken) {
+          if (authResult?.user?.multiFactor?.user?.accessToken) {
             Cookies.set(
               '__session',
-              authResult.user.stsTokenManager.accessToken,
+              authResult.user.multiFactor.user.accessToken,
             );
 
             if (authResult.additionalUserInfo.isNewUser) {
               sendEmailVerification(authResult.user);
             }
 
-            return false;
+            return true;
           }
-          return true;
+          return false;
         },
         signInFailure: (error: any) => {
           console.error('Sign-in error:', error);

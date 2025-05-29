@@ -1,19 +1,10 @@
-import { TranslationKey } from '../types';
+import { Locale, TranslationKey } from '../types';
 import translations from './translations';
-import useAppState from '../store/store';
-import { useShallow } from 'zustand/react/shallow';
+
+export type Params = Record<string, string>;
 
 
-type Params = Record<string, string>;
-
-const useTranslate = () => {
-  const { currentLanguage } = useAppState(
-    useShallow((state) => ({
-      currentLanguage: state.currentLanguage,
-    }))
-  );
-
-  return (key: TranslationKey, params?: Params): string => {
+  const trans = (locale: Locale, key: TranslationKey, params?: Params): string => {
     const textObject = translations[key];
 
     if (!textObject) {
@@ -21,11 +12,11 @@ const useTranslate = () => {
       return key; // Fallback: return the key itself
     }
 
-    let translatedText = textObject[currentLanguage] as string;
+    let translatedText = textObject[locale] as string;
 
     if (translatedText === undefined) {
       console.warn(
-        `Translation for key "${key}" in language "${currentLanguage}" not found. Falling back to English.`,
+        `Translation for key "${key}" in language "${locale}" not found. Falling back to English.`,
       );
       translatedText = textObject['en'] || key; // Fallback to English, or key if English is also missing
     }
@@ -42,6 +33,6 @@ const useTranslate = () => {
 
     return translatedText;
   };
-};
 
-export default useTranslate;
+
+export default trans;

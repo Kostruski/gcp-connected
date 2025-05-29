@@ -5,21 +5,22 @@ import { onAuthStateChanged, Unsubscribe } from 'firebase/auth';
 import Cookies from 'js-cookie';
 import { useEffect, useMemo, useRef } from 'react'; // No need for useMemo here for the effect
 import dynamic from 'next/dynamic';
-import useAppState from '../store/store';
+import useAppState from '../../store/store';
 import { useShallow } from 'zustand/react/shallow';
-import { createStars, updateStarAppearance } from './render-stars';
+import { createStars, updateStarAppearance } from '../render-stars/render-stars';
 import Link from 'next/dist/client/link';
 import _ from 'lodash';
 import {
   getFirebaseAppClientSide,
   signOutUser,
-} from '../lib/firebase/firebase-client-side';
+} from '../../lib/firebase/firebase-client-side';
 
 const HeaderComponent = () => {
   const { currentUser, setCurrentUser } = useAppState(
     useShallow((state) => ({
       currentUser: state.currentUser,
       setCurrentUser: state.setCurrentUser,
+      setCurrentLanguage: state.setCurrentLanguage,
     })),
   );
   const unsubscribeRef = useRef<Unsubscribe>(() => {});

@@ -1,12 +1,12 @@
 import { User } from '@firebase/auth';
 import { create } from 'zustand/react';
-import { LanguageCode } from '../types';
+import { Locale } from '../types';
 
 interface State {
   currentUser: null | User;
   setCurrentUser: (user: User | null) => void;
-  currentLanguage: LanguageCode;
-  setCurrentLanguage: (lang: LanguageCode) => void;
+  currentLanguage: Locale;
+  setCurrentLanguage: (lang: Locale) => void;
 }
 
 const useAppState = create<State>()((set) => ({
