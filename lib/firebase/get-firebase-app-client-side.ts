@@ -1,41 +1,30 @@
-// firebase.ts
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import { Auth, getAuth, signOut, EmailAuthProvider } from 'firebase/auth';
+// import firebase from 'firebase/compat/app';
+// import 'firebase/compat/auth';
+// import { Auth, getAuth, signOut, EmailAuthProvider } from 'firebase/auth';
+// import { FirebaseApp } from 'firebase/app';
+// import { firebaseConfig } from './firebaseConfig';
 
-export const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
+// let app: FirebaseApp;
+// let authInstance: Auth;
 
-let app: FirebaseApp; //Declare a variable to hold the app instance.
-let authInstance: Auth; //Declare a variable to hold the auth instance.
+// export const getFirebaseAppClientSide = () => {
+//   if (!app) {
+//     // Initialize Firebase using the compat API.  This is CRITICAL for the global 'firebase' object.
+//     app = firebase.initializeApp(firebaseConfig);
+//     authInstance = getAuth(app);
+//   }
 
-export const getFirebaseAppClientSide = () => {
-  // const stack = new Error().stack;
-  // if (stack) {
-  //   const stackLines = stack.split('\n');
-  //   console.log('Firebase stack trace:', stackLines[2]);
-  // }
+//   return { app, authInstance };
+// };
 
-  if (!app) {
-    app = initializeApp(firebaseConfig);
-    authInstance = getAuth(app);
-  }
-  return { app, authInstance };
-};
+// export async function signOutUser() {
+//   const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
+//   try {
+//     return await signOut(firebaseAuth);
+//   } catch (error) {
+//     console.error('Sign-out error:', error);
+//     throw error;
+//   }
+// }
 
-const { authInstance: firebaseAuth } = getFirebaseAppClientSide();
-
-export async function signOutUser() {
-  try {
-    return await signOut(firebaseAuth);
-  } catch (error) {
-    console.error('Sign-out error:', error);
-    throw error;
-  }
-}
-
-export const emailAuthProviderId = EmailAuthProvider.PROVIDER_ID;
+// export const emailAuthProviderId = EmailAuthProvider.PROVIDER_ID;

@@ -1,7 +1,7 @@
 'use client';
 import { Row, Col, Card, Button } from 'react-bootstrap';
 import Container from 'react-bootstrap/esm/Container';
-import useAppState from '../../store/store';
+import useAppState from '../../../store/store';
 import { sendEmailVerification } from 'firebase/auth';
 import { useShallow } from 'zustand/react/shallow';
 

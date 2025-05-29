@@ -1,10 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import useAppState from '../../store/store';
+import useAppState from '../../../store/store';
 import { useShallow } from 'zustand/react/shallow';
 import { useEffect } from 'react';
-import { signOutUser } from '../../lib/firebase/get-firebase-app-client-side';
+import { signOutUser } from '../../../lib/firebase/firebase-client-side';
 
 const LogoutPage = () => {
   const { currentUser, setCurrentUser } = useAppState(
