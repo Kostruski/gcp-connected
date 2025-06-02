@@ -7,7 +7,7 @@ const cardsTranslations = {
     en: 'The Magician',
     pl: 'Mag',
   },
-  '2_Highpriestess': {
+  '2_highpriestess': {
     en: 'The High Priestess',
     pl: 'Arcykapłanka',
   },

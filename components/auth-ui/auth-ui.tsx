@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { startSignInUi } from '../lib/firebase/firebase-client-side';
+import { startSignInUi } from '../../lib/firebase/firebase-client-side';
 
 const AuthUi = () => {
   useEffect(() => {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '../globals.scss';
-import Header from '../../components/header';
+import Header from '../../components/header/header';
 import { Col, Container, Row } from 'react-bootstrap';
 import Script from 'next/script';
 

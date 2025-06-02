@@ -12,4 +12,4 @@ export type TranslationsEntry = {
   [K in Locale]: string;
 };
 
-export type TranslationObject = Record<TranslationKey, TranslationsEntry>;
+export type TranslationObject = Record<string, TranslationsEntry>;
