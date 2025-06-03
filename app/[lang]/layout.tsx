@@ -4,6 +4,7 @@ import '../globals.scss';
 import Header from '../../components/header/header';
 import { Col, Container, Row } from 'react-bootstrap';
 import Script from 'next/script';
+import { Locale } from '../../types';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -33,7 +34,7 @@ export default async function RootLayout({
   params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: Locale }>;
 }>) {
   const { lang } = await params;
   return (
@@ -73,7 +74,7 @@ export default async function RootLayout({
         <Container className="py-4 h-100" fluid>
           <Row className="justify-content-center h-100">
             <Col xs={12} xl={8}>
-              <Header />
+              <Header locale={lang} />
               {children}
             </Col>
           </Row>

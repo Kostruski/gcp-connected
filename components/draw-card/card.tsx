@@ -1,10 +1,10 @@
 'use client';
 import Image from 'next/image';
-// import trans, { Params } from '../../translations/translate';
-// import { TranslationKey } from '../../types';
+import { useState } from 'react';
 
-const Card = ({ imageSrc }: { imageSrc: string }) => {
-  //  const t = (key: TranslationKey, params?: Params) => trans(lang, key, params);
+const Card = ({ imageSrc, name }: { imageSrc: string; name: string }) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
   return (
     <div style={{ minWidth: '50px' }} className="position-relative w-100">
       <div
@@ -14,9 +14,10 @@ const Card = ({ imageSrc }: { imageSrc: string }) => {
           paddingBottom: '184.8%',
           overflow: 'hidden',
         }}
+        onClick={() => setIsFlipped(!isFlipped)}
       >
         <Image
-          src={imageSrc}
+          src={isFlipped ? imageSrc : '/cards/cover.png'}
           alt={'tarot card'}
           fill={true}
           onError={(e) => console.error(e.target)}
@@ -24,6 +25,7 @@ const Card = ({ imageSrc }: { imageSrc: string }) => {
           style={{ objectFit: 'cover' }}
         />
       </div>
+      <p className="py-2 text-center">{isFlipped ? name : ''}</p>
     </div>
   );
 };
