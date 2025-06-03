@@ -1,5 +1,3 @@
-import { Col, Container, Row } from 'react-bootstrap';
-
 import trans, { Params } from '../../../translations/translate';
 import { Locale, TranslationKey } from '../../../types';
 import checkAuth from '../../../utils/checkAuth';
@@ -15,24 +13,20 @@ const ReadPage = async ({
   const t = (key: TranslationKey, params?: Params) => trans(lang, key, params);
 
   return (
-    <Container>
-      <Row>
-        <Col>{t('read_page_title')}</Col>
-      </Row>
-      <Row>
-        <Col>{t('read_page_description')}</Col>
-      </Row>
-      <Row>
-        <Col>
-          <p>{t('read_page_instructions')}</p>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <DrawCards />
-        </Col>
-      </Row>
-    </Container>
+    <div className="d-flex flex-column h-100">
+      <div className="my-4 text-center">
+        <h2>{t('read_page_title')}</h2>
+      </div>
+      <div className="my-4 text-center">
+        <p>{t('read_page_description')}</p>
+      </div>
+      <div className="my-4 text-center">
+        <p>{t('read_page_instructions')}</p>
+      </div>
+      <div className="my-4 h-100">
+        <DrawCards />
+      </div>
+    </div>
   );
 };
 
