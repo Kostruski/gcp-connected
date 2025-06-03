@@ -15,6 +15,10 @@ const homePageTranslations = {
     en: 'This Tarot card reader is for entertainment purposes only. The interpretations provided are not a substitute for professional advice.',
     pl: 'Ten czytnik kart Tarota jest przeznaczony wyłącznie do celów rozrywkowych. Interpretacje nie zastępują profesjonalnej porady.',
   },
+  home_page_button: {
+    pl: 'Rozpocznij czytanie',
+    en: 'Start Reading',
+  },
 } as const;
 
 export default homePageTranslations;

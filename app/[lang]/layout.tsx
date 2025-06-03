@@ -69,10 +69,13 @@ export default async function RootLayout({
           src={`https://www.gstatic.com/firebasejs/ui/6.1.0/firebase-ui-auth__${lang}.js`}
           strategy="beforeInteractive"
         ></Script>
-        <Header />
-        <Container fluid className="p-4">
-          <Row>
-            <Col xs={12}>{children}</Col>
+
+        <Container className="py-4 h-100" fluid>
+          <Row className="justify-content-center h-100">
+            <Col xs={12} xl={8}>
+              <Header />
+              {children}
+            </Col>
           </Row>
         </Container>
       </body>
