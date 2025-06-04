@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { verifyToken } from '../lib/firebase/get-firebase-app-server-side';
+import { verifyToken } from '../lib/firebase/firebaseAdmin';
 
 // add this at the top of each auth page.
 const checkAuth = async () => {

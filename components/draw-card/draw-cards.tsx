@@ -5,6 +5,8 @@ import Card from './card';
 import cardsTranslations from '../../translations/cardsTranslations';
 import { TarotCardName } from '../../types';
 import { ALL_TAROT_CARD_NAMES } from '../../utils/cardsInfo';
+import TarotChat from '../tarot-chat/tarot-chat';
+import translations from '../../translations/translations';
 
 const DrawCards = () => {
   const { currentLanguage } = useAppState(
@@ -23,17 +25,24 @@ const DrawCards = () => {
   }
 
   const selectedCards = Array.from(cardsSet) as TarotCardName[];
+  const initialCards = selectedCards.map((cardKey, index) => ({
+    name: cardsTranslations[cardKey][currentLanguage],
+    position: translations.card_positions[currentLanguage][index],
+  }));
 
   return (
-    <div className="d-flex justify-content-center flex-wrap flex-nowrap gap-3 h-100 w-50 mx-auto">
-      {selectedCards.map((cardKey) => (
-        <Card
-          key={cardKey}
-          imageSrc={`/cards/${cardKey}.png`}
-          name={cardsTranslations[cardKey][currentLanguage]}
-        />
-      ))}
-    </div>
+    <>
+      <div className="d-flex justify-content-center flex-wrap flex-nowrap gap-3 h-100 w-50 mx-auto">
+        {selectedCards.map((cardKey) => (
+          <Card
+            key={cardKey}
+            imageSrc={`/cards/${cardKey}.png`}
+            name={cardsTranslations[cardKey][currentLanguage]}
+          />
+        ))}
+      </div>
+      <TarotChat initialCards={initialCards} />
+    </>
   );
 };
 

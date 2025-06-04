@@ -11,6 +11,10 @@ const readPageTranslations = {
     en: 'Select a card to reveal its meaning and interpretation.',
     pl: 'Wybierz kartę, aby odkryć jej znaczenie i interpretację.',
   },
+  card_positions: {
+    pl: ['pierwsza', 'druga', 'trzecia'],
+    en: ['first', 'second', 'third'],
+  },
 };
 
 export default readPageTranslations;
