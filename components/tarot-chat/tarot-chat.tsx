@@ -7,6 +7,11 @@ import {
 } from '../../app/actions/tarot';
 import QuestionInput from '../auth-ui/question-input/question-input';
 
+import Stack from 'react-bootstrap/Stack';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
+
 // Same interfaces as in actions/tarot.ts and lib/firestore.ts
 interface TarotCard {
   name: string;
@@ -53,13 +58,15 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
       if (result.error) {
         setError(result.error);
         setInitialReadingInitiated(false); // Allow re-attempt if error
-      } else if (result.reading && result.conversationId) {
-        setReading(result.reading);
-        setConversationId(result.conversationId);
-        setConversationHistory([
-          { role: 'model', parts: [{ text: result.reading }] },
-        ]);
       }
+
+      // else if ( result.reading && result.conversationId ) {
+      //   setReading(result.reading);
+      //   setConversationId(result.conversationId);
+      //   setConversationHistory([
+      //     { role: 'model', parts: [{ text: result.reading }] },
+      //   ]);
+      // }
     } catch (err) {
       setError('Failed to get initial reading. Please try again.');
       console.error('Error getting initial reading:', err);
@@ -110,100 +117,98 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
     }
   };
 
-  // Decide what to render based on whether the initial question has been submitted
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        Your Tarot Reading
-      </h2>
+    <Stack gap={3} className="col-md-5 mx-auto">
+      <h2>Your Tarot Reading</h2>
 
       {!initialReadingInitiated ? (
-        // Display the QuestionInput component if the initial reading process hasn't started
         <QuestionInput
           onQuestionSubmit={handleInitialQuestionSubmit}
-          isLoading={isLoading} // Propagate loading state
+          isLoading={isLoading}
           submitButtonText="Start My Tarot Reading"
           placeholder="What specific question or intention do you have for this reading?"
         />
       ) : (
-        // Once the initial question is submitted, display the reading and chat interface
         <>
-          {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+          {error && <p>{error}</p>}
 
-          {/* Initial Reading Display */}
           {reading ? (
-            <div className="mt-4 p-4 bg-gray-50 border rounded-lg">
-              <h3 className="text-xl font-semibold mb-2">Initial Reading:</h3>
-              <p className="whitespace-pre-wrap">{reading}</p>
+            <div>
+              <h3>Initial Reading:</h3>
+              <p>{reading}</p>
             </div>
           ) : (
-            <div className="mt-4 text-center text-gray-600">
+            <div>
               <p>Generating your initial reading...</p>
-              {/* You can add a spinner here if needed */}
+              <Spinner animation="border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
             </div>
           )}
 
-          {/* Conversation History and Follow-up Input */}
-          {reading && ( // Only show conversation area after initial reading is loaded
-            <div className="mt-6 border-t pt-4">
-              <h3 className="text-xl font-semibold mb-3">Conversation:</h3>
-              <div className="max-h-80 overflow-y-auto border p-3 rounded bg-gray-50 flex flex-col space-y-2">
+          {reading && (
+            <Stack gap={2}>
+              <h3>Conversation:</h3>
+              <div
+                style={{
+                  maxHeight: '200px',
+                  overflowY: 'auto',
+                  border: '1px solid #ccc',
+                  padding: '10px',
+                }}
+              >
                 {conversationHistory.map((msg, index) => (
                   <div
                     key={index}
-                    className={`flex ${
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    className={`d-flex ${
+                      msg.role === 'user'
+                        ? 'justify-content-end'
+                        : 'justify-content-start'
                     }`}
                   >
                     <span
-                      className={`inline-block p-2 rounded-lg max-w-[80%] ${
-                        msg.role === 'user'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-200 text-gray-800'
-                      }`}
+                      style={{
+                        padding: '8px',
+                        borderRadius: '5px',
+                        maxWidth: '80%',
+                        backgroundColor:
+                          msg.role === 'user' ? '#e0f7fa' : '#f0f0f0',
+                      }}
                     >
                       {msg.parts[0].text}
                     </span>
                   </div>
                 ))}
                 {isLoading && (
-                  <div className="text-center text-gray-500">
-                    <span className="dot-pulse"></span>{' '}
-                    {/* Simple loading animation */}
+                  <div className="text-center">
+                    <Spinner animation="grow" />
                   </div>
                 )}
               </div>
 
-              {/* Follow-up Input */}
-              <div className="mt-4 flex">
-                <input
+              <div className="d-flex">
+                <Form.Control
                   type="text"
                   value={currentQuestion}
                   onChange={(e) => setCurrentQuestion(e.target.value)}
                   placeholder="Ask a follow-up question..."
-                  className="flex-grow shadow appearance-none border rounded-l w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter' && !isLoading) {
                       handleFollowUp();
                     }
                   }}
                 />
-                <button
+                <Button
                   onClick={handleFollowUp}
                   disabled={isLoading || !currentQuestion.trim()}
-                  className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-r focus:outline-none focus:shadow-outline ${
-                    isLoading || !currentQuestion.trim()
-                      ? 'opacity-50 cursor-not-allowed'
-                      : ''
-                  }`}
                 >
                   Ask
-                </button>
+                </Button>
               </div>
-            </div>
+            </Stack>
           )}
         </>
       )}
-    </div>
+    </Stack>
   );
 }

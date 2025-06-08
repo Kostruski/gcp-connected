@@ -74,8 +74,8 @@ export async function generateTarotReading(
   if (!decodedToken) {
     redirect('/logout');
   }
-  const userId = decodedToken.uid; // Extract UID from the decoded token
-  // --- End Auth Check ---
+  // const userId = decodedToken.uid; // Extract UID from the decoded token
+  // // --- End Auth Check ---
 
   if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
     return {
@@ -153,15 +153,15 @@ export async function generateTarotReading(
     // Note: If you want to track the initial prompt's token count,
     // you would either pass it here or store it with the user's initial question
     // in a separate message object if you restructure initial conversation.
-    const conversationId = await createConversation(
-      userId,
-      cards,
-      userQuestion,
-      text ?? '',
-      responseTokenCount, // Pass the AI response token count
-    );
+    // const conversationId = await createConversation(
+    //   userId,
+    //   cards,
+    //   userQuestion,
+    //   text ?? '',
+    //   responseTokenCount, // Pass the AI response token count
+    // );
     console.log(
-      `Initial reading saved with conversation ID: ${conversationId}`,
+      `This conversation used tokens: ${responseTokenCount}`,
     );
     // --- End Save ---
 

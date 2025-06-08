@@ -2,7 +2,6 @@ import { Button } from 'react-bootstrap';
 import GoldenStar from '../../components/golden-star/golden-star';
 import trans, { Params } from '../../translations/translate';
 import { Locale, TranslationKey } from '../../types';
-import checkAuth from '../../utils/checkAuth';
 import Link from 'next/link';
 
 const HomePage = async ({
@@ -10,7 +9,6 @@ const HomePage = async ({
 }: Readonly<{
   params: Promise<{ lang: Locale }>;
 }>) => {
-  await checkAuth();
   const { lang } = await params;
   const t = (key: TranslationKey, params?: Params) => trans(lang, key, params);
 

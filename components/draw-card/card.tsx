@@ -1,10 +1,15 @@
 'use client';
 import Image from 'next/image';
-import { useState } from 'react';
 
-const Card = ({ imageSrc, name }: { imageSrc: string; name: string }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
+export type CardProps = {
+  name: string;
+  imageSrc: string;
+  isFlipped: boolean;
+  setIsFlipped: (flipped: boolean) => void;
+  position: string;
+};
 
+const Card = ({ imageSrc, name, isFlipped, setIsFlipped }: CardProps) => {
   return (
     <div style={{ minWidth: '50px' }} className="position-relative w-100">
       <div
@@ -14,7 +19,9 @@ const Card = ({ imageSrc, name }: { imageSrc: string; name: string }) => {
           paddingBottom: '184.8%',
           overflow: 'hidden',
         }}
-        onClick={() => setIsFlipped(!isFlipped)}
+        onClick={() => {
+          if (!isFlipped) setIsFlipped(true);
+        }}
       >
         <Image
           src={isFlipped ? imageSrc : '/cards/cover.png'}
