@@ -17,15 +17,21 @@ import {
   getFirebaseAppClientSide,
   signOutUser,
 } from '../../lib/firebase/firebase-client-side';
+import { Locale } from '../../types';
 
-const HeaderComponent = () => {
-  const { currentUser, setCurrentUser } = useAppState(
+const HeaderComponent = ({ locale }: { locale: Locale }) => {
+  const { currentUser, setCurrentUser, setCurrentLanguage } = useAppState(
     useShallow((state) => ({
       currentUser: state.currentUser,
       setCurrentUser: state.setCurrentUser,
       setCurrentLanguage: state.setCurrentLanguage,
     })),
   );
+
+  useEffect(() => {
+    setCurrentLanguage(locale);
+  }, [locale, setCurrentLanguage]);
+
   const unsubscribeRef = useRef<Unsubscribe>(() => {});
 
   const debounceCreateStars = useMemo(() => {

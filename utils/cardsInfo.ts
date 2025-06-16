@@ -3,7 +3,7 @@
 export const ALL_TAROT_CARD_NAMES = [
   '0_fool',
   '1_magician',
-  '2_Highpriestess',
+  '2_highpriestess',
   '3_empress',
   '4_emperor',
   '5_hierophant',
