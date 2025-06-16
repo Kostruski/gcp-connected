@@ -69,7 +69,7 @@ export function setupStarParallax(): void {
     const starSize: number = parseFloat(star.dataset.starSize || '1');
 
     // Adjust speed based on star size: larger stars move faster
-    const baseParallaxSpeed: number = 0.08;
+    const baseParallaxSpeed: number = 0.12;
     const sizeFactor: number = 0.07;
     const effectiveParallaxSpeed: number =
       baseParallaxSpeed + (starSize - 1) * sizeFactor;

@@ -1,17 +1,16 @@
 'use server';
 
 // Import necessary modules from Google Cloud Vertex AI SDK
-import { Content, VertexAI } from '@google-cloud/vertexai';
+import { VertexAI } from '@google-cloud/vertexai';
 import { HarmBlockThreshold, HarmCategory } from '@google-cloud/vertexai';
 import { verifyToken } from '../../lib/firebase/firebaseAdmin';
-import {
-  createConversation,
-  getConversation,
-  appendMessagesToConversation,
-} from '../../lib/firebase/firestore';
+import { createConversation } from '../../lib/firebase/firestore';
 import { redirect } from 'next/navigation';
 import { AI_MODEL_NAME } from '../../utils/ai-model-name';
-import { FieldValue } from 'firebase-admin/firestore';
+import { Locale, TranslationKey } from '../../types';
+import trans, { Params } from '../../translations/translate';
+
+// --- End Helper ---
 
 // --- Module-level (Singleton) Vertex AI Client Initialization ---
 const vertex_ai = new VertexAI({
@@ -47,15 +46,6 @@ interface TarotCard {
   position: string;
 }
 
-// Represents a single message in the conversation for multi-turn interactions
-// Adjusted to include tokenCount for Firestore storage
-interface Message {
-  role: 'user' | 'model';
-  parts: { text: string }[];
-  tokenCount?: number; // Make optional as it might not be present in client-side Message type
-  timestamp?: FieldValue; // Optional for Firestore, but not used in AI prompts
-}
-
 /**
  * Generates an initial comprehensive Tarot card reading and saves it to Firestore.
  * This is typically the first call for a new reading session.
@@ -67,20 +57,23 @@ interface Message {
 export async function generateTarotReading(
   cards: TarotCard[],
   userQuestion: string = '',
+  locale: Locale,
 ): Promise<{ reading: string; conversationId?: string; error?: string }> {
   // --- Authentication/Authorization Check ---
   const decodedToken = await verifyToken(); // Get the decoded token
+  const t = (key: TranslationKey, params?: Params) =>
+    trans(locale, key, params);
 
   if (!decodedToken) {
     redirect('/logout');
   }
-  // const userId = decodedToken.uid; // Extract UID from the decoded token
+  const userId = decodedToken.uid; // Extract UID from the decoded token
   // // --- End Auth Check ---
 
   if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
     return {
       reading: '',
-      error: 'Server configuration error: Missing Google Cloud settings.',
+      error: t('error_server_config'),
     };
   }
   if (
@@ -88,37 +81,28 @@ export async function generateTarotReading(
     cards.length === 0 ||
     cards.some((c) => !c.name || !c.position)
   ) {
-    return { reading: '', error: 'Invalid card selection provided.' };
+    return { reading: '', error: t('error_invalid_card_selection') };
   }
 
   try {
-    let prompt = `You are an experienced, wise, and empathetic Tarot card reader.
-    You will provide a detailed and insightful interpretation for the following Tarot card spread.
-    Focus on integrating the traditional meanings of the cards with their given positions.
-    Be encouraging and thoughtful, but also realistic and provide actionable insights.
-    The reading should be coherent, well-structured, and flow naturally, like a professional consultation.
-
-    Cards in the spread:
-    `;
+    let prompt = `${t('tarot_reader_persona')}\n${t(
+      'tarot_reading_instruction_main',
+    )}\n\n${t('tarot_reading_spread_intro')}\n`;
 
     cards.forEach((card, index) => {
-      prompt += `\n${index + 1}. Card: "${card.name}" in the "${
-        card.position
-      }" position.`;
+      prompt += `\n${index + 1}. ${t('tarot_reading_card_format', {
+        cardName: card.name,
+        cardPosition: card.position,
+      })}`;
     });
 
     if (userQuestion) {
-      prompt += `\n\nThe user's specific question or intention for this reading is: "${userQuestion}"`;
+      prompt += `\n\n${t('tarot_reading_user_question_intro', {
+        userQuestion: userQuestion,
+      })}`;
     }
 
-    prompt += `\n\nProvide a comprehensive interpretation of this spread, covering each card's meaning in its position, and then offer an overall synthesis of the reading. Aim for a response length between 200-500 words.`;
-
-    console.log('Sending initial Tarot reading prompt to Vertex AI...');
-
-    // The promptTokenCount for the initial reading can be associated with the initial AI message
-    // or tracked separately if you want to explicitly log user input cost.
-    // For simplicity here, we'll assume billing mainly considers model output tokens
-    // in createConversation, but promptTokens could be used for user cost.
+    prompt += `\n\n${t('tarot_reading_interpretation_request')}`;
 
     const resp = await generativeModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -150,19 +134,14 @@ export async function generateTarotReading(
     const responseTokenCount = countTokens(text); // Calculate tokens for the AI's response
 
     // --- Save initial reading to Firestore ---
-    // Note: If you want to track the initial prompt's token count,
-    // you would either pass it here or store it with the user's initial question
-    // in a separate message object if you restructure initial conversation.
-    // const conversationId = await createConversation(
-    //   userId,
-    //   cards,
-    //   userQuestion,
-    //   text ?? '',
-    //   responseTokenCount, // Pass the AI response token count
-    // );
-    console.log(
-      `This conversation used tokens: ${responseTokenCount}`,
+    const conversationId = await createConversation(
+      userId,
+      cards,
+      userQuestion,
+      text ?? '',
+      responseTokenCount, // Pass the AI response token count
     );
+    console.log('log_conversation_tokens_used', responseTokenCount);
     // --- End Save ---
 
     return { reading: text, conversationId: conversationId };
@@ -170,7 +149,7 @@ export async function generateTarotReading(
     console.error('Error generating initial Tarot reading:', error);
     return {
       reading: '',
-      error: 'Failed to generate initial reading. Please try again later.',
+      error: t('error_failed_to_generate_reading'),
     };
   }
 }
@@ -184,180 +163,3 @@ export async function generateTarotReading(
  * @param newUserQuestion The new question from the user.
  * @returns An object containing the AI's response and the updated conversation history, or an error.
  */
-export async function continueTarotReading(
-  conversationId: string,
-  newUserQuestion: string,
-): Promise<{ response: string; updatedHistory: Message[]; error?: string }> {
-  // --- Authentication/Authorization Check ---
-  const decodedToken = await verifyToken(); // Get the decoded token
-  if (!decodedToken) {
-    redirect('/logout');
-  }
-  const userId = decodedToken.uid; // Extract UID from the decoded token
-  // --- End Auth Check ---
-
-  if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
-    return {
-      response: '',
-      updatedHistory: [],
-      error: 'Server configuration error: Missing Google Cloud settings.',
-    };
-  }
-  if (!newUserQuestion.trim()) {
-    return {
-      response: '',
-      updatedHistory: [],
-      error: 'Please enter a follow-up question.',
-    };
-  }
-
-  try {
-    // --- Fetch conversation from Firestore ---
-    const conversation = await getConversation(conversationId);
-    if (!conversation || conversation.userId !== userId) {
-      // Ensure user owns the conversation
-      return {
-        response: '',
-        updatedHistory: [],
-        error: 'Conversation not found or unauthorized access.',
-      };
-    }
-    const { initialCards, initialQuestion, history } = conversation;
-    // --- End Fetch ---
-
-    // Define the system instruction for the AI, including initial context
-    const systemInstruction: Content = {
-      role: 'system',
-      parts: [
-        {
-          text: `You are an insightful and empathetic Tarot card reader.
-          You have provided an initial reading based on these cards:
-          ${initialCards
-            .map((c) => `Card: "${c.name}" in the "${c.position}" position.`)
-            .join('\n')}
-          The initial question was: "${initialQuestion}"
-          The initial comprehensive reading provided was:
-          "${
-            history[0]?.parts[0]?.text || 'No initial reading text available.'
-          }"
-
-          Now, the user has a follow-up question. Answer directly and empathetically based on the Tarot context.
-          Maintain a conversational and supportive tone. Keep responses concise unless a detailed explanation is requested.
-          If the user's question goes completely off-topic from Tarot, gently guide them back or state that you can only provide Tarot-related guidance.`,
-        },
-      ],
-    };
-
-    // Prepare the full conversation history for Gemini, including the new user message
-    // Note: The 'timestamp' field in Message type from firestore.ts is FieldValue.
-    // For sending to Vertex AI, we only need 'role' and 'parts'.
-    const userMessageForHistory: Message = {
-      role: 'user',
-      parts: [{ text: newUserQuestion }],
-    };
-    const messagesToSendToAI: Content[] = [
-      systemInstruction,
-      ...history.map((msg) => ({ role: msg.role, parts: msg.parts })), // Strip tokenCount/timestamp for AI
-      { role: userMessageForHistory.role, parts: userMessageForHistory.parts },
-    ];
-
-    console.log('Sending follow-up prompt to Vertex AI with history...');
-
-    // Calculate tokens for the user's new message (part of the prompt)
-    const newUserQuestionTokenCount = countTokens(newUserQuestion);
-
-    // Calculate total input tokens sent to the model for this turn (promptTokens)
-    const systemInstructionContent = systemInstruction.parts
-      .map((p) => p.text)
-      .join('');
-    const historicalContent = history
-      .map((msg) => msg.parts.map((p) => p.text).join(''))
-      .join('');
-
-    const promptTokens =
-      countTokens(systemInstructionContent) +
-      countTokens(historicalContent) +
-      newUserQuestionTokenCount;
-
-    const resp = await generativeModel.generateContent({
-      contents: messagesToSendToAI,
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-      generationConfig: {
-        temperature: 0.8,
-        maxOutputTokens: 500,
-      },
-    });
-
-    const aiResponseText =
-      resp?.response?.candidates?.[0].content.parts[0].text ?? '';
-    const aiResponseTokenCount = countTokens(aiResponseText); // Calculate tokens for AI response
-
-    // --- Update conversation history in Firestore ---
-    // Prepare messages to append with token counts for Firestore
-    const userMessageToAppend: Omit<Message, 'timestamp'> = {
-      role: 'user',
-      parts: [{ text: newUserQuestion }],
-      // Store the *total input tokens* for this turn with the user's message
-      // This is a common strategy to track the cost associated with the user's query.
-      tokenCount: promptTokens,
-    };
-    const modelMessageToAppend: Omit<Message, 'timestamp'> = {
-      role: 'model',
-      parts: [{ text: aiResponseText }],
-      tokenCount: aiResponseTokenCount,
-    };
-
-    await appendMessagesToConversation(
-      conversationId,
-      userMessageToAppend,
-      modelMessageToAppend,
-    );
-    // --- End Update ---
-
-    // Return the updated history for client-side state
-    // For client display, we manually construct the history with the new messages.
-    // The timestamps here are symbolic for the client, as Firestore will set the true ones.
-    const updatedHistoryForClient: Message[] = [
-      ...history, // Original history from DB
-      {
-        ...userMessageToAppend,
-        // Using `Date.now()` as a temporary timestamp for client-side display,
-        // actual Firestore timestamp is set by appendMessagesToConversation.
-        timestamp: FieldValue.serverTimestamp(), // Cast to any to satisfy FieldValue type during mock
-      },
-      {
-        ...modelMessageToAppend,
-        timestamp: FieldValue.serverTimestamp(), // Cast to any
-      },
-    ];
-
-    return {
-      response: aiResponseText,
-      updatedHistory: updatedHistoryForClient,
-    };
-  } catch (error) {
-    console.error('Error continuing Tarot reading:', error);
-    return {
-      response: '',
-      updatedHistory: [],
-      error: 'Failed to generate response. Please try again later.',
-    };
-  }
-}

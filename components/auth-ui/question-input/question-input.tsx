@@ -3,28 +3,31 @@
 import { useState } from 'react';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button'; // Import Button component
+import Button from 'react-bootstrap/Button';
+import { Locale, TranslationKey } from '../../../types';
+import trans, { Params } from '../../../translations/translate'; // Assuming this is your `trans` function
 
 interface QuestionInputProps {
   onQuestionSubmit: (question: string) => Promise<void>;
   isLoading: boolean;
-  submitButtonText?: string;
-  placeholder?: string;
+  locale: Locale;
 }
 
 export default function QuestionInput({
   onQuestionSubmit,
   isLoading,
-  submitButtonText = 'Submit Question',
-  placeholder = 'Type your question here...',
+  locale,
 }: QuestionInputProps) {
   const [question, setQuestion] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const t = (key: TranslationKey, params?: Params) =>
+    trans(locale, key, params); // Ensure 'trans' can access 'readPageTranslations' or is general enough
+
   const handleSubmit = async () => {
     setError(null); // Clear previous errors
     if (!question.trim()) {
-      setError('Please enter a question before submitting.');
+      setError(t('question_input_error_empty'));
       return;
     }
 
@@ -32,31 +35,34 @@ export default function QuestionInput({
       await onQuestionSubmit(question);
       setQuestion(''); // Clear input after successful submission
     } catch (err) {
-      // The parent component's onQuestionSubmit should handle and display API errors.
-      // This catch is for unexpected client-side errors during submission.
-      setError('An unexpected error occurred during submission.');
+      setError(t('question_input_error_unexpected'));
       console.error('Client-side error submitting question:', err);
     }
   };
 
   return (
     <div>
-      <h2>Post Your Question</h2>
-      {error && <p>{error}</p>}
-      <div>
-        <FloatingLabel controlId="floatingTextarea" label="Your Question">
+      <h2>{t('question_input_title')}</h2>
+      {error && <p className="text-danger">{error}</p>}{' '}
+      <div className="mb-4">
+        <FloatingLabel
+          controlId="floatingTextarea"
+          label={t('question_input_label')}
+        >
           <Form.Control
             as="textarea"
-            placeholder={placeholder}
+            placeholder={t('question_input_default_placeholder')}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             disabled={isLoading}
-            style={{ height: '100px' }} // You might want to adjust this height as needed
+            style={{ height: '100px' }}
           />
         </FloatingLabel>
       </div>
       <Button onClick={handleSubmit} disabled={isLoading || !question.trim()}>
-        {isLoading ? 'Submitting...' : submitButtonText}
+        {isLoading
+          ? t('question_input_submitting_button')
+          : t('question_input_submit_button')}
       </Button>
     </div>
   );

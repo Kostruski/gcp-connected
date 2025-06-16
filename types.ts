@@ -13,4 +13,3 @@ export type TranslationsEntry = {
 };
 
 export type TranslationObject = Record<string, TranslationsEntry>;
-
