@@ -20,8 +20,8 @@ export const tarotReadingPrompts = {
     pl: 'Konkretne pytanie lub intencja użytkownika dla tego odczytu to: „{userQuestion}”',
   },
   tarot_reading_interpretation_request: {
-    en: "Provide a comprehensive interpretation of this spread, covering each card's meaning in its position, and then offer an overall synthesis of the reading. Aim for a response length between 200-500 words.",
-    pl: 'Zapewnij kompleksową interpretację tego rozkładu, obejmującą znaczenie każdej karty w jej pozycji, a następnie przedstaw ogólną syntezę odczytu. Dąż do długości odpowiedzi między 200-500 słów.',
+    en: "Provide a comprehensive interpretation of this spread, covering each card's meaning in its position, and then offer an overall synthesis of the reading. Conclude with a clear, actionable summary or a thoughtful closing statement. Aim for a response length of 400 words.",
+    pl: 'Zapewnij kompleksową interpretację tego rozkładu, obejmującą znaczenie każdej karty w jej pozycji, a następnie przedstaw ogólną syntezę odczytu. Zakończ jasnym, praktycznym podsumowaniem lub przemyślanym stwierdzeniem końcowym. Dąż do długości odpowiedzi wynoszącej 400 słów.',
   },
   error_server_config: {
     en: 'Server configuration error: Missing Google Cloud settings.',

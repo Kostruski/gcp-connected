@@ -6,7 +6,6 @@ import cardsTranslations from '../../translations/cardsTranslations';
 import { TarotCardName, TranslationKey } from '../../types';
 import { ALL_TAROT_CARD_NAMES } from '../../utils/cardsInfo';
 import TarotChat from '../tarot-chat/tarot-chat';
-import translations from '../../translations/translations';
 import { useEffect, useState } from 'react';
 import trans, { Params } from '../../translations/translate';
 

@@ -3,12 +3,20 @@
 // Import necessary modules from Google Cloud Vertex AI SDK
 import { VertexAI } from '@google-cloud/vertexai';
 import { HarmBlockThreshold, HarmCategory } from '@google-cloud/vertexai';
+
+// REMOVE these two lines as synthesizeSpeech is now in a separate file:
+// import { TextToSpeechClient } from '@google-cloud/text-to-speech';
+// const textToSpeechClient = new TextToSpeechClient();
+
 import { verifyToken } from '../../lib/firebase/firebaseAdmin';
 import { createConversation } from '../../lib/firebase/firestore';
 import { redirect } from 'next/navigation';
 import { AI_MODEL_NAME } from '../../utils/ai-model-name';
 import { Locale, TranslationKey } from '../../types';
 import trans, { Params } from '../../translations/translate';
+
+// Import synthesizeSpeech and VoiceResult from the new file
+import { synthesizeSpeech, VoiceResult } from '../../utils/textToSpeech'; // <-- NEW IMPORT
 
 // --- End Helper ---
 
@@ -52,13 +60,24 @@ interface TarotCard {
  *
  * @param cards An array of TarotCard objects representing the spread.
  * @param userQuestion An optional question or intention from the user for the reading.
- * @returns An object containing the generated reading, its conversation ID, or an error message.
+ * @param locale The locale for the reading and voice.
+ * @param generateAudio Boolean to indicate if voice audio should be generated. <-- NEW PARAMETER
+ * @param voiceGender The desired gender for the voice ('FEMALE', 'MALE', or 'NEUTRAL'). Defaults to 'NEUTRAL'. <-- NEW PARAMETER
+ * @returns An object containing the generated reading, its conversation ID, the audio data (if generated), or an error message.
  */
 export async function generateTarotReading(
   cards: TarotCard[],
   userQuestion: string = '',
   locale: Locale,
-): Promise<{ reading: string; conversationId?: string; error?: string }> {
+  generateAudio: boolean = false, // <-- NEW PARAMETER WITH DEFAULT
+  voiceGender: 'FEMALE' | 'MALE' = 'FEMALE', // <-- NEW PARAMETER WITH DEFAULT
+): Promise<{
+  reading: string;
+  conversationId?: string;
+  error?: string;
+  audio?: VoiceResult;
+}> {
+  // <-- UPDATED RETURN TYPE (audio is now optional)
   // --- Authentication/Authorization Check ---
   const decodedToken = await verifyToken(); // Get the decoded token
   const t = (key: TranslationKey, params?: Params) =>
@@ -126,12 +145,20 @@ export async function generateTarotReading(
       ],
       generationConfig: {
         temperature: 0.9,
-        maxOutputTokens: 800,
+        maxOutputTokens: 1000,
       },
     });
 
     const text = resp?.response?.candidates?.[0].content.parts[0].text ?? '';
     const responseTokenCount = countTokens(text); // Calculate tokens for the AI's response
+
+    let audioResult: VoiceResult | null = null; // Initialize audioResult
+
+    // --- Conditionally Generate voice for the reading --- <-- UPDATED LOGIC
+    if (generateAudio) {
+      audioResult = await synthesizeSpeech(text, locale, voiceGender); // Pass voiceGender
+    }
+    // --- End Conditional Voice Generation ---
 
     // --- Save initial reading to Firestore ---
     const conversationId = await createConversation(
@@ -144,7 +171,12 @@ export async function generateTarotReading(
     console.log('log_conversation_tokens_used', responseTokenCount);
     // --- End Save ---
 
-    return { reading: text, conversationId: conversationId };
+    // Include audio in response ONLY if it was generated
+    return {
+      reading: text,
+      conversationId: conversationId,
+      ...(audioResult && { audio: audioResult }), // Conditionally add audio property
+    };
   } catch (error) {
     console.error('Error generating initial Tarot reading:', error);
     return {
