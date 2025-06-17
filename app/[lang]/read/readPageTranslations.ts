@@ -63,6 +63,53 @@ const readPageTranslations = {
     en: 'Type your question here...',
     pl: 'Wpisz swoje pytanie tutaj...',
   },
+  validateTarotQuestion_context: {
+    en: `You are an expert in Tarot card readings. Your task is to validate if the user's question is suitable for a Tarot card reading.
+    A suitable question is clear, specific, and related to the user's personal growth or understanding. It should invite deeper self-reflection rather than seeking definitive predictions, simple yes/no answers, or insights into unrelated general topics. Tarot guides the seeker's journey, not external events or others' free will.
+
+    Here are some examples of valid questions:
+    - What can I expect in my love life in the coming months?
+    - How can I improve my relationship with my family?
+    - What are the potential career paths for me?
+    - What are the challenges I need to overcome to achieve my goals?
+
+    Here are some examples of invalid questions:
+    - Will I win the lottery? (Seeks to predict the future with certainty)
+    - Is there a god? (General topic, not related to personal life)
+    - Yes or no? (Yes/no question)
+    - What is the meaning of life? (Too broad and philosophical)
+
+    Evaluate the following question and respond with valid JSON in the following format. Respond with only the JSON object, no additional text:
+
+    {
+    "isValid": true|false,
+    }
+
+    User question:`,
+    pl: `Jesteś ekspertem w dziedzinie czytania kart Tarota. Twoim zadaniem jest sprawdzenie, czy pytanie użytkownika nadaje się do odczytu kart Tarota.
+    Odpowiednie pytanie jest jasne, konkretne i dotyczy osobistego rozwoju lub zrozumienia użytkownika. Powinno zachęcać do głębszej autorefleksji, a nie szukać definitywnych przewidywań, prostych odpowiedzi tak/nie, ani wglądu w niezwiązane tematy ogólne. Tarot prowadzi w podróży poszukiwacza, a nie zewnętrznych wydarzeń czy wolnej woli innych.
+
+    Oto kilka przykładów prawidłowych pytań:
+
+    - Czego mogę spodziewać się w życiu miłosnym w nadchodzących miesiącach?
+    - Jak mogę poprawić swoje relacje z rodziną?
+    - Jakie są dla mnie potencjalne ścieżki kariery?
+    - Jakie wyzwania muszę pokonać, aby osiągnąć swoje cele?
+
+    Oto kilka przykładów nieprawidłowych pytań:
+    - Czy wygram na loterii? (Ma na celu przewidzenie przyszłości z całą pewnością)
+    - Czy Bóg istnieje? (Temat ogólny, niezwiązany z życiem osobistym)
+    - Tak czy nie? (Pytanie tak/nie)
+    - Jaki jest sens życia? (Zbyt szerokie i filozoficzne)
+
+    Oceń poniższe pytanie i odpowiedz w następującym formacie JSON. Odpowiedz tylko obiektem JSON, bez dodatkowego tekstu.
+
+    {
+    "isValid": true|false,
+    }
+
+    Pytanie użytkownika:`,
+  },
 } as const;
 
 export default readPageTranslations;

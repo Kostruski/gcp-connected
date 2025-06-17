@@ -4,8 +4,8 @@ import { useState } from 'react';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { Locale, TranslationKey } from '../../../types';
-import trans, { Params } from '../../../translations/translate'; // Assuming this is your `trans` function
+import { Locale, TranslationKey } from '../../types';
+import trans, { Params } from '../../translations/translate';
 
 interface QuestionInputProps {
   onQuestionSubmit: (question: string) => Promise<void>;

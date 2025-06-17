@@ -4,21 +4,15 @@
 import { VertexAI } from '@google-cloud/vertexai';
 import { HarmBlockThreshold, HarmCategory } from '@google-cloud/vertexai';
 
-// REMOVE these two lines as synthesizeSpeech is now in a separate file:
-// import { TextToSpeechClient } from '@google-cloud/text-to-speech';
-// const textToSpeechClient = new TextToSpeechClient();
-
 import { verifyToken } from '../../lib/firebase/firebaseAdmin';
 import { createConversation } from '../../lib/firebase/firestore';
 import { redirect } from 'next/navigation';
-import { AI_MODEL_NAME } from '../../utils/ai-model-name';
+import { AI_MODEL_NAME, LOW_TIER_MODEL_NAME } from '../../utils/ai-model-name';
 import { Locale, TranslationKey } from '../../types';
 import trans, { Params } from '../../translations/translate';
 
-// Import synthesizeSpeech and VoiceResult from the new file
-import { synthesizeSpeech, VoiceResult } from '../../utils/textToSpeech'; // <-- NEW IMPORT
-
-// --- End Helper ---
+import { synthesizeSpeech, VoiceResult } from '../../utils/textToSpeech';
+import { validateTarotQuestion } from '../../utils/validateTarotQuestion';
 
 // --- Module-level (Singleton) Vertex AI Client Initialization ---
 const vertex_ai = new VertexAI({
@@ -27,6 +21,11 @@ const vertex_ai = new VertexAI({
 });
 
 const generativeModel = vertex_ai.getGenerativeModel({ model: AI_MODEL_NAME });
+
+// Initialize a separate model for validation, potentially a faster one
+const validationModel = vertex_ai.getGenerativeModel({
+  model: LOW_TIER_MODEL_NAME,
+});
 
 if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
   console.error(
@@ -37,13 +36,8 @@ if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
 // --- End Singleton Initialization ---
 
 // --- Basic Token Counter (for estimation) ---
-// IMPORTANT: This is a basic approximation. For precise billing, consider:
-// 1. Using a more robust tokenizer (e.g., 'js-tiktoken' or similar if applicable to your model).
-// 2. Ideally, getting token counts directly from the Vertex AI API response
-//    if it becomes available in a straightforward manner for your model type.
 function countTokens(text: string): number {
   if (!text) return 0;
-  // A simple split by whitespace is a rough estimate.
   return text.split(/\s+/).filter(Boolean).length;
 }
 // --- End Token Counter ---
@@ -61,32 +55,31 @@ interface TarotCard {
  * @param cards An array of TarotCard objects representing the spread.
  * @param userQuestion An optional question or intention from the user for the reading.
  * @param locale The locale for the reading and voice.
- * @param generateAudio Boolean to indicate if voice audio should be generated. <-- NEW PARAMETER
- * @param voiceGender The desired gender for the voice ('FEMALE', 'MALE', or 'NEUTRAL'). Defaults to 'NEUTRAL'. <-- NEW PARAMETER
+ * @param generateAudio Boolean to indicate if voice audio should be generated.
+ * @param voiceGender The desired gender for the voice ('FEMALE', 'MALE', or 'NEUTRAL').
  * @returns An object containing the generated reading, its conversation ID, the audio data (if generated), or an error message.
  */
 export async function generateTarotReading(
   cards: TarotCard[],
   userQuestion: string = '',
   locale: Locale,
-  generateAudio: boolean = false, // <-- NEW PARAMETER WITH DEFAULT
-  voiceGender: 'FEMALE' | 'MALE' = 'FEMALE', // <-- NEW PARAMETER WITH DEFAULT
+  generateAudio: boolean = false,
+  voiceGender: 'FEMALE' | 'MALE' = 'FEMALE',
 ): Promise<{
   reading: string;
   conversationId?: string;
   error?: string;
   audio?: VoiceResult;
 }> {
-  // <-- UPDATED RETURN TYPE (audio is now optional)
   // --- Authentication/Authorization Check ---
-  const decodedToken = await verifyToken(); // Get the decoded token
+  const decodedToken = await verifyToken();
   const t = (key: TranslationKey, params?: Params) =>
     trans(locale, key, params);
 
   if (!decodedToken) {
     redirect('/logout');
   }
-  const userId = decodedToken.uid; // Extract UID from the decoded token
+  const userId = decodedToken.uid;
   // // --- End Auth Check ---
 
   if (!process.env.GCP_PROJECT_ID || !process.env.GCP_LOCATION) {
@@ -102,6 +95,39 @@ export async function generateTarotReading(
   ) {
     return { reading: '', error: t('error_invalid_card_selection') };
   }
+
+  // --- NEW: Question Validation Step ---
+  // Only validate if a user question is provided
+  if (userQuestion && userQuestion.trim() !== '') {
+    try {
+      const validationResult = await validateTarotQuestion(
+        userQuestion,
+        validationModel, // Pass the separate validation model instance
+        locale,
+      );
+
+      console.log('validationResult:', validationResult);
+
+      if (!validationResult.isValid) {
+        // If the question is invalid, return an error.
+        // The error message here is a simple one, as the client will handle the prompt for rephrasing.
+        return {
+          reading: '',
+          error: 'invalid_question', // This error message comes from your translations
+        };
+      }
+    } catch (validationError: any) {
+      console.error(
+        'Error during pre-reading question validation:',
+        validationError,
+      );
+      return {
+        reading: '',
+        error: validationError.message || 'error_validating_question',
+      };
+    }
+  }
+  // --- End NEW: Question Validation Step ---
 
   try {
     let prompt = `${t('tarot_reader_persona')}\n${t(
@@ -150,32 +176,27 @@ export async function generateTarotReading(
     });
 
     const text = resp?.response?.candidates?.[0].content.parts[0].text ?? '';
-    const responseTokenCount = countTokens(text); // Calculate tokens for the AI's response
+    const responseTokenCount = countTokens(text);
 
-    let audioResult: VoiceResult | null = null; // Initialize audioResult
+    let audioResult: VoiceResult | null = null;
 
-    // --- Conditionally Generate voice for the reading --- <-- UPDATED LOGIC
     if (generateAudio) {
-      audioResult = await synthesizeSpeech(text, locale, voiceGender); // Pass voiceGender
+      audioResult = await synthesizeSpeech(text, locale, voiceGender);
     }
-    // --- End Conditional Voice Generation ---
 
-    // --- Save initial reading to Firestore ---
     const conversationId = await createConversation(
       userId,
       cards,
       userQuestion,
       text ?? '',
-      responseTokenCount, // Pass the AI response token count
+      responseTokenCount,
     );
     console.log('log_conversation_tokens_used', responseTokenCount);
-    // --- End Save ---
 
-    // Include audio in response ONLY if it was generated
     return {
       reading: text,
       conversationId: conversationId,
-      ...(audioResult && { audio: audioResult }), // Conditionally add audio property
+      ...(audioResult && { audio: audioResult }),
     };
   } catch (error) {
     console.error('Error generating initial Tarot reading:', error);
@@ -185,13 +206,3 @@ export async function generateTarotReading(
     };
   }
 }
-
-/**
- * Continues a Tarot card reading conversation, handling follow-up questions.
- * This function fetches the conversation history from Firestore, appends new messages,
- * and saves the updated history back.
- *
- * @param conversationId The ID of the ongoing conversation.
- * @param newUserQuestion The new question from the user.
- * @returns An object containing the AI's response and the updated conversation history, or an error.
- */
