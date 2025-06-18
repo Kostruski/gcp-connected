@@ -4,12 +4,12 @@ import {
   GenerativeModel,
   HarmBlockThreshold,
   HarmCategory,
-  FunctionDeclarationSchemaType, // <--- Import this!
 } from '@google-cloud/vertexai';
 
 import { verifyToken } from '../lib/firebase/firebaseAdmin';
 import trans, { Params } from '../translations/translate';
 import { Locale, TranslationKey } from '../types';
+import { validateQuestionSchema } from './promptSchemas';
 
 // Define the expected structure of the AI's response
 interface ValidationResult {
@@ -49,19 +49,6 @@ export async function validateTarotQuestion(
       'validateTarotQuestion_context',
     )}\n "${userQuestion}"`;
 
-    // Define the response schema explicitly, using FunctionDeclarationSchemaType
-    const responseSchema = {
-      type: FunctionDeclarationSchemaType.OBJECT, // <--- Use the enum here!
-      properties: {
-        isValid: {
-          type: FunctionDeclarationSchemaType.BOOLEAN, // <--- And here!
-          description:
-            'True if the question is suitable for a Tarot reading, false otherwise.',
-        },
-      },
-      required: ['isValid'],
-    };
-
     const resp = await validationModel.generateContent({
       contents: [{ role: 'user', parts: [{ text: validationPrompt }] }],
       safetySettings: [
@@ -86,7 +73,7 @@ export async function validateTarotQuestion(
         temperature: 0.0,
         maxOutputTokens: 20,
         responseMimeType: 'application/json',
-        responseSchema: responseSchema, // This is now correctly typed
+        responseSchema: validateQuestionSchema, // This is now correctly typed
       },
     });
 

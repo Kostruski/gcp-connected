@@ -13,3 +13,18 @@ export type TranslationsEntry = {
 };
 
 export type TranslationObject = Record<string, TranslationsEntry>;
+
+export interface TarotReadingResponse {
+  introduction: string;
+  cardsInterpretation: Array<{
+    cardName: string;
+    position: string;
+    interpretation: string;
+  }>;
+  overallSynthesis: string;
+  actionableSummary: {
+    intro: string;
+    points: string[];
+  };
+  conclusion: string;
+}

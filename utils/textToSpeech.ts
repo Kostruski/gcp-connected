@@ -15,42 +15,38 @@ export interface VoiceResult {
 //TODO add name mapping for locales and male and female voices
 
 /**
- * Generates audio from text using Google Cloud Text-to-Speech.
- * @param text The text to synthesize.
+ * Generates audio from SSML using Google Cloud Text-to-Speech.
+ * This function assumes the `text` parameter *always* contains SSML.
+ *
+ * @param ssmlText The SSML to synthesize (must include <speak> tags).
  * @param locale The locale to determine the voice.
- * @param gender The desired gender for the voice ('FEMALE', 'MALE', or 'NEUTRAL'). Defaults to 'NEUTRAL'.
+ * @param gender The desired gender for the voice ('FEMALE', 'MALE', or 'NEUTRAL'). Defaults to 'FEMALE'.
  * @returns A Promise that resolves to VoiceResult containing Base64 audio content and mimeType, or null if an error occurs.
  */
 export async function synthesizeSpeech(
-  text: string,
+  ssmlText: string, // Renamed to clarify it's always SSML
   locale: Locale,
   gender: 'FEMALE' | 'MALE' = 'FEMALE',
 ): Promise<VoiceResult | null> {
   try {
-    let languageCode = 'en-US';
-    let name = 'en-US-Neural2-C'; // A common default, natural-sounding English voice
+    let languageCode = 'en-GB';
+    let name = 'en-GB-Standard-C'; // A common default, natural-sounding English voice
 
     // Customize voice based on locale
-    // Note: The specific 'name' (voice ID) might also need to be adjusted based on desired gender.
-    // For simplicity, we'll primarily use ssmlGender for the initial implementation.
-    // For more control, you'd check available voices for 'languageCode' and 'gender' combinations.
     if (locale === 'pl') {
       languageCode = 'pl-PL';
-      // Polish WaveNet-A is female. If 'MALE' is chosen, you'd pick a different Polish voice.
-      name = 'pl-PL-Wavenet-A';
+      name = 'pl-PL-Standard-F'; // Polish WaveNet-A is female.
     } else {
-      languageCode = 'en-US';
-      // For English, Neural2-H is female. You could switch to Neural2-D for male, for example.
-      // E.g., if (gender === 'MALE') name = 'en-US-Neural2-D'; else name = 'en-US-Neural2-H';
-      name = 'en-US-Neural2-H';
+      languageCode = 'en-GB';
+      name = 'en-GB-Standard-C'; // For English, Neural2-H is female.
     }
 
     const [response] = await textToSpeechClient.synthesizeSpeech({
-      input: { text: text },
+      input: { ssml: ssmlText }, // <-- ALWAYS USE SSML INPUT HERE
       voice: {
         languageCode: languageCode,
         name: name,
-        ssmlGender: gender, // <-- USING THE NEW GENDER PARAMETER
+        ssmlGender: gender,
       },
       audioConfig: { audioEncoding: 'MP3' },
     });

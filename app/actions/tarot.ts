@@ -13,6 +13,8 @@ import trans, { Params } from '../../translations/translate';
 
 import { synthesizeSpeech, VoiceResult } from '../../utils/textToSpeech';
 import { validateTarotQuestion } from '../../utils/validateTarotQuestion';
+import { readingResponseSchema } from '../../utils/promptSchemas';
+import { jsonToSsml } from '../../utils/jsonToSsml';
 
 // --- Module-level (Singleton) Vertex AI Client Initialization ---
 const vertex_ai = new VertexAI({
@@ -96,8 +98,6 @@ export async function generateTarotReading(
     return { reading: '', error: t('error_invalid_card_selection') };
   }
 
-  // --- NEW: Question Validation Step ---
-  // Only validate if a user question is provided
   if (userQuestion && userQuestion.trim() !== '') {
     try {
       const validationResult = await validateTarotQuestion(
@@ -105,8 +105,6 @@ export async function generateTarotReading(
         validationModel, // Pass the separate validation model instance
         locale,
       );
-
-      console.log('validationResult:', validationResult);
 
       if (!validationResult.isValid) {
         // If the question is invalid, return an error.
@@ -172,29 +170,50 @@ export async function generateTarotReading(
       generationConfig: {
         temperature: 0.9,
         maxOutputTokens: 1000,
+        responseMimeType: 'application/json',
+        responseSchema: readingResponseSchema,
       },
     });
 
-    const text = resp?.response?.candidates?.[0].content.parts[0].text ?? '';
-    const responseTokenCount = countTokens(text);
+    // The response is now a JSON string, so we need to parse it
+    const aiResponseJsonString =
+      resp?.response?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    let parsedReading: any = null;
+    try {
+      parsedReading = JSON.parse(aiResponseJsonString);
+    } catch (parseError) {
+      console.error('Error parsing AI response JSON:', parseError);
+      return {
+        reading: '',
+        error: 'error JSON parsing ai response',
+      };
+    }
+
+    console.log('AI Response:', parsedReading);
+
+    const responseTokenCount = countTokens(aiResponseJsonString);
 
     let audioResult: VoiceResult | null = null;
 
     if (generateAudio) {
-      audioResult = await synthesizeSpeech(text, locale, voiceGender);
+      // You might want to generate SSML directly from the parsed object for more control
+      // For simplicity here, we convert the combined Markdown text to SSML
+      const ssmlText = jsonToSsml(parsedReading);
+      console.log('Generated SSML for TTS:', ssmlText);
+      audioResult = await synthesizeSpeech(ssmlText, locale, voiceGender);
     }
 
     const conversationId = await createConversation(
       userId,
       cards,
       userQuestion,
-      text ?? '',
+      parsedReading ?? '',
       responseTokenCount,
     );
     console.log('log_conversation_tokens_used', responseTokenCount);
 
     return {
-      reading: text,
+      reading: aiResponseJsonString,
       conversationId: conversationId,
       ...(audioResult && { audio: audioResult }),
     };

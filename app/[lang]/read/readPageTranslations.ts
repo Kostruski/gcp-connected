@@ -64,51 +64,54 @@ const readPageTranslations = {
     pl: 'Wpisz swoje pytanie tutaj...',
   },
   validateTarotQuestion_context: {
-    en: `You are an expert in Tarot card readings. Your task is to validate if the user's question is suitable for a Tarot card reading.
-    A suitable question is clear, specific, and related to the user's personal growth or understanding. It should invite deeper self-reflection rather than seeking definitive predictions, simple yes/no answers, or insights into unrelated general topics. Tarot guides the seeker's journey, not external events or others' free will.
+    en: `You are a filter for a Tarot reading application. Your only task is to determine if the user's input is a sensible query, an intention, or a question, and if it is free of offensive or nonsensical content. Do NOT judge the quality or depth of the question for a Tarot reading; simply check if it's a valid, non-abusive piece of text that could reasonably be directed at an app for spiritual guidance.
 
-    Here are some examples of valid questions:
-    - What can I expect in my love life in the coming months?
-    - How can I improve my relationship with my family?
-    - What are the potential career paths for me?
-    - What are the challenges I need to overcome to achieve my goals?
+    Here are examples of valid inputs:
+    - What should I do next?
+    - My intention is to find peace.
+    - How can I improve myself?
+    - Tell me about my future.
+    - Is he the one for me?
 
-    Here are some examples of invalid questions:
-    - Will I win the lottery? (Seeks to predict the future with certainty)
-    - Is there a god? (General topic, not related to personal life)
-    - Yes or no? (Yes/no question)
-    - What is the meaning of life? (Too broad and philosophical)
+    Here are examples of invalid inputs:
+    - asdflkjasdflkjasdf (Nonsense)
+    - You are stupid. (Insult/Offensive)
+    - Give me all your money. (Command, not a question/intention)
+    - ***@@#$$$ (Gibberish)
+    - I want to know who will win the lottery and how to cheat the system. (Promotes illegal or unethical activities, seeks forbidden knowledge)
+    - I will kill you. (Threat)
 
-    Evaluate the following question and respond with valid JSON in the following format. Respond with only the JSON object, no additional text:
-
-    {
-    "isValid": true|false,
-    }
-
-    User question:`,
-    pl: `Jesteś ekspertem w dziedzinie czytania kart Tarota. Twoim zadaniem jest sprawdzenie, czy pytanie użytkownika nadaje się do odczytu kart Tarota.
-    Odpowiednie pytanie jest jasne, konkretne i dotyczy osobistego rozwoju lub zrozumienia użytkownika. Powinno zachęcać do głębszej autorefleksji, a nie szukać definitywnych przewidywań, prostych odpowiedzi tak/nie, ani wglądu w niezwiązane tematy ogólne. Tarot prowadzi w podróży poszukiwacza, a nie zewnętrznych wydarzeń czy wolnej woli innych.
-
-    Oto kilka przykładów prawidłowych pytań:
-
-    - Czego mogę spodziewać się w życiu miłosnym w nadchodzących miesiącach?
-    - Jak mogę poprawić swoje relacje z rodziną?
-    - Jakie są dla mnie potencjalne ścieżki kariery?
-    - Jakie wyzwania muszę pokonać, aby osiągnąć swoje cele?
-
-    Oto kilka przykładów nieprawidłowych pytań:
-    - Czy wygram na loterii? (Ma na celu przewidzenie przyszłości z całą pewnością)
-    - Czy Bóg istnieje? (Temat ogólny, niezwiązany z życiem osobistym)
-    - Tak czy nie? (Pytanie tak/nie)
-    - Jaki jest sens życia? (Zbyt szerokie i filozoficzne)
-
-    Oceń poniższe pytanie i odpowiedz w następującym formacie JSON. Odpowiedz tylko obiektem JSON, bez dodatkowego tekstu.
+    Evaluate the following user input and respond with valid JSON in the following format. Respond with only the JSON object, no additional text:
 
     {
-    "isValid": true|false,
+    "isValid": true|false
     }
 
-    Pytanie użytkownika:`,
+    User input:`,
+    pl: `Jesteś filtrem dla aplikacji do czytania Tarota. Twoim jedynym zadaniem jest określenie, czy wprowadzony przez użytkownika tekst jest sensownym zapytaniem, intencją lub pytaniem, oraz czy jest wolny od obraźliwych lub bezsensownych treści. NIE OCENIAJ jakości ani głębi pytania pod kątem czytania Tarota; po prostu sprawdź, czy jest to poprawny, nieobraźliwy fragment tekstu, który można rozsądnie skierować do aplikacji oferującej duchowe wskazówki.
+
+    Oto przykłady prawidłowych danych wejściowych:
+    - Co powinienem dalej zrobić?
+    - Moją intencją jest znalezienie spokoju.
+    - Jak mogę się poprawić?
+    - Opowiedz mi o mojej przyszłości.
+    - Czy on/ona jest dla mnie?
+
+    Oto przykłady nieprawidłowych danych wejściowych:
+    - asdflkjasdflkjasdf (Bezsensowne)
+    - Jesteś głupi/głupia. (Obraza/Obraźliwe)
+    - Daj mi wszystkie swoje pieniądze. (Polecenie, nie pytanie/intencja)
+    - ***@@#$$$ (Bełkot)
+    - Chcę wiedzieć, kto wygra na loterii i jak oszukać system. (Promuje nielegalne lub nieetyczne działania, szuka zakazanej wiedzy)
+    - Zabiję cię. (Groźba)
+
+    Oceń poniższe dane wejściowe użytkownika i odpowiedz w następującym formacie JSON. Odpowiedz tylko obiektem JSON, bez dodatkowego tekstu.
+
+    {
+    "isValid": true|false
+    }
+
+    Dane wejściowe użytkownika:`,
   },
 } as const;
 

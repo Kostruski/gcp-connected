@@ -12,8 +12,10 @@ import Button from 'react-bootstrap/Button';
 import { useShallow } from 'zustand/shallow';
 import useAppState from '../../store/store';
 import { generateTarotReading } from '../../app/actions/tarot';
-import { TranslationKey } from '../../types';
+import { TarotReadingResponse, TranslationKey } from '../../types';
 import trans, { Params } from '../../translations/translate';
+import TextScroller from '../text-scroller/text-scroller';
+import TarotReadingDisplay from '../tarot-reading-display/tarot-reading-display';
 
 // Same interfaces as in actions/tarot.ts and lib/firestore.ts
 interface TarotCard {
@@ -33,7 +35,7 @@ interface TarotChatProps {
 
 export default function TarotChat({ initialCards }: TarotChatProps) {
   const [, setInitialQuestion] = useState<string>('');
-  const [reading, setReading] = useState<string | null>(null);
+  const [reading, setReading] = useState<TarotReadingResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInvalidQuestion, setIsInvalidQuestion] = useState(false);
@@ -70,8 +72,7 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
       }
       setAudioPlayer(null);
     }
-  }, [audioResult, audioPlayer]);
-
+  }, [audioResult]);
 
   const handleInitialQuestionSubmit = async (question: string) => {
     // Validate that tarot cards have been selected before proceeding
@@ -123,10 +124,13 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
         }
         setInitialReadingInitiated(false); // Keep the input UI visible
       } else if (result.reading) {
-        setReading(result.reading);
+        const parsedReading = JSON.parse(result.reading);
+        if (parsedReading) setReading(parsedReading);
+
         if (result.audio) {
           setAudioResult(result.audio);
         }
+
         setInitialReadingInitiated(true); // Only initiate reading view if successful
       } else {
         // Fallback for unexpected successful response without reading text
@@ -216,7 +220,6 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
             locale={currentLanguage}
           />
 
-          {/* NEW: Simple UI for invalid question guidance */}
           {isInvalidQuestion && (
             <p className="text-info mt-3">
               Tarot helps you explore personal growth. Try asking about your
@@ -229,10 +232,11 @@ export default function TarotChat({ initialCards }: TarotChatProps) {
         // Once initial reading is initiated (and successfully generated)
         <>
           {error && <p className="text-danger">{error}</p>}{' '}
-          {/* Display errors even after initiation if they occur */}
           {reading ? (
             <div className="bg-gray-100 p-4 rounded-lg shadow-sm">
-              <p className="whitespace-pre-wrap">{reading}</p>
+              <TextScroller>
+                <TarotReadingDisplay readingData={reading} />
+              </TextScroller>
               {audioResult && (
                 <div className="mt-3">
                   <Button onClick={handlePlayAgain} disabled={isLoading}>
